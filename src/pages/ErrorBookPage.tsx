@@ -48,18 +48,18 @@ export function ErrorBookPage() {
   };
 
   return (
-    <GameShell title="📕 Sổ Sai Lầm" subtitle="Ôn lại những ý đã sai để không lặp lại">
+    <GameShell title="� Bệnh Viện Hóa Học" subtitle="Giải cứu điểm số: Chữa lành các kiến thức bị hổng">
       <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <p className="font-bold text-violet-700">{errorBook.length} lỗi sai đã ghi nhận</p>
+          <p className="font-bold text-rose-600">{errorBook.length} ca bệnh kiến thức</p>
           {errorBook.length > 0 && (
             <div className="flex gap-2">
               <button
                 onClick={startQuiz}
-                className="rounded-lg bg-violet-600 px-3 py-1 text-sm font-bold text-white"
+                className="rounded-lg bg-rose-600 px-3 py-1 text-sm font-bold text-white"
               >
-                🧠 Ôn lại
+                💉 Cấp cứu ngay
               </button>
               <button onClick={clearErrorBook} className="rounded-lg bg-slate-300 px-3 py-1 text-sm">
                 Xóa hết

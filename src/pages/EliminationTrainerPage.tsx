@@ -106,7 +106,7 @@ export function EliminationTrainerPage() {
   const unsureCount = Object.values(confidence).filter((c) => c === "unsure").length;
 
   return (
-    <GameShell title="🎯 Luyện Loại Trừ" subtitle="Phương pháp 2 vòng: Chắc chắn → Tập trung">
+    <GameShell title="🥷 Thợ Săn Loại Trừ" subtitle="Tuyệt kỹ nhẫn giả: Phân biệt Thực - Hư">
       {/* Stats bar */}
       {totalQ > 0 && (
         <div className="mb-3 rounded-2xl bg-white/90 p-2 text-center text-sm">

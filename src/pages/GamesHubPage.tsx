@@ -3,9 +3,12 @@ import { Gamepad2, Stars } from "lucide-react";
 
 export function GamesHubPage() {
   const miniGames = [
-    { to: "/game/box", title: "🎁 Hộp Bí Ẩn", color: "from-pink-400 to-fuchsia-400", desc: "Mở hộp đoán đúng sai nhận vàng" },
-    { to: "/game/pirate", title: "🏴‍☠️ Đảo Hải Tặc", color: "from-amber-400 to-orange-400", desc: "Săn kho báu kiến thức hoá học" },
-    { to: "/game/run", title: "🏃 Đường Chạy Vô Cực", color: "from-cyan-400 to-blue-400", desc: "Chạy đua giới hạn trí tuệ" },
+    { to: "/game/arena", title: "⚔️ Đấu Trường Hóa Học", color: "from-violet-500 to-indigo-500", desc: "3 vòng sinh tử – Chinh phục điểm 10 như thi thật" },
+    { to: "/game/eliminate", title: "🥷 Thợ Săn Loại Trừ", color: "from-emerald-400 to-teal-500", desc: "Trò chơi luyện phản xạ loại trừ thần tốc" },
+    { to: "/game/errors", title: "🚑 Bệnh Viện Hóa Học", color: "from-rose-400 to-pink-500", desc: "Giải cứu các kiến thức đã sai thành vàng" },
+    { to: "/game/box", title: "🎁 Hộp Bí Ẩn", color: "from-pink-400 to-fuchsia-400", desc: "Mở hộp đoán đúng sai nhận vàng thưởng to" },
+    { to: "/game/pirate", title: "🏴‍☠️ Đảo Hải Tặc", color: "from-amber-400 to-orange-400", desc: "Săn kho báu tri thức hoá học" },
+    { to: "/game/run", title: "🏃 Đường Chạy Vô Cực", color: "from-cyan-400 to-blue-400", desc: "Chạy đua liên tục vượt giới hạn trí tuệ" },
   ];
 
   return (
