@@ -82,10 +82,10 @@ export function EliminationTrainerPage() {
 
     let msg = scoreLabel(cc) + ` → +${gold} gold`;
     if (confidentWrong > 0) {
-      msg += `\n🚨 Ban CHAC CHAN nhung lai SAI ${confidentWrong} y! Can on lai kien thuc nay.`;
+      msg += `\n🚨 Bạn CHẮC CHẮN nhưng lại SAI ${confidentWrong} ý! Cần ôn lại kiến thức này.`;
     }
     if (cc === 4) {
-      msg += "\n🎉 Phuong phap loai tru hieu qua!";
+      msg += "\n🎉 Phương pháp loại trừ hiệu quả!";
     }
 
     setTotalScore((s) => s + score);
@@ -106,18 +106,18 @@ export function EliminationTrainerPage() {
   const unsureCount = Object.values(confidence).filter((c) => c === "unsure").length;
 
   return (
-    <GameShell title="🎯 Luyen Loai Tru" subtitle="Phuong phap 2 vong: Chac chan → Tap trung">
+    <GameShell title="🎯 Luyện Loại Trừ" subtitle="Phương pháp 2 vòng: Chắc chắn → Tập trung">
       {/* Stats bar */}
       {totalQ > 0 && (
         <div className="mb-3 rounded-2xl bg-white/90 p-2 text-center text-sm">
           <span>
-            Da lam: <b>{totalQ}</b> cau
+            Đã làm: <b>{totalQ}</b> câu
           </span>
           <span className="ml-3">
-            TB: <b>{(totalScore / totalQ).toFixed(2)}</b>d/cau
+            TB: <b>{(totalScore / totalQ).toFixed(2)}</b>đ/câu
           </span>
           <span className="ml-3">
-            Tong: <b>{totalScore.toFixed(2)}</b>d
+            Tổng: <b>{totalScore.toFixed(2)}</b>đ
           </span>
         </div>
       )}
@@ -125,13 +125,13 @@ export function EliminationTrainerPage() {
       <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
         {/* Strategy guide */}
         <div className="mb-3 rounded-xl bg-violet-50 p-3 text-sm">
-          <p className="font-bold text-violet-700">💡 Chien thuat Loai Tru:</p>
+          <p className="font-bold text-violet-700">💡 Chiến thuật Loại Trừ:</p>
           <p>
-            <b>Vong 1:</b> Danh dau y ban <span className="font-bold text-emerald-600">CHAC CHAN</span> biet va y{" "}
-            <span className="font-bold text-amber-600">CHUA CHAC</span>
+            <b>Vòng 1:</b> Đánh dấu ý bạn <span className="font-bold text-emerald-600">CHẮC CHẮN</span> biết và ý{" "}
+            <span className="font-bold text-amber-600">CHƯA CHẮC</span>
           </p>
           <p>
-            <b>Vong 2:</b> Tap trung toan bo suy nghi vao y CHUA CHAC
+            <b>Vòng 2:</b> Tập trung toàn bộ suy nghĩ vào ý CHƯA CHẮC
           </p>
         </div>
 
@@ -142,7 +142,7 @@ export function EliminationTrainerPage() {
         {/* PHASE: MARK */}
         {phase === "mark" && (
           <>
-            <p className="mt-2 text-sm font-bold text-violet-600">Vong 1: Phan loai do tu tin (bam de doi)</p>
+            <p className="mt-2 text-sm font-bold text-violet-600">Vòng 1: Phân loại độ tự tin (bấm để đổi)</p>
             <div className="mt-2 space-y-2">
               {q.statements.map((s) => {
                 const conf = confidence[s.id] || "none";
@@ -162,22 +162,22 @@ export function EliminationTrainerPage() {
                       {s.label} <ChemText text={s.text} />
                     </p>
                     <p className="mt-1 text-xs">
-                      {conf === "sure" && "🟢 Chac chan"}
-                      {conf === "unsure" && "🟡 Chua chac"}
-                      {conf === "none" && "⚪ Chua phan loai"}
+                      {conf === "sure" && "🟢 Chắc chắn"}
+                      {conf === "unsure" && "🟡 Chưa chắc"}
+                      {conf === "none" && "⚪ Chưa phân loại"}
                     </p>
                   </button>
                 );
               })}
             </div>
             <p className="mt-2 text-xs text-slate-500">
-              Chac chan: {sureCount} | Chua chac: {unsureCount}
+              Chắc chắn: {sureCount} | Chưa chắc: {unsureCount}
             </p>
             <button
               onClick={goToFocus}
               className="mt-3 w-full rounded-xl bg-violet-600 p-3 font-bold text-white"
             >
-              Sang Vong 2 →
+              Sang Vòng 2 →
             </button>
           </>
         )}
@@ -185,7 +185,7 @@ export function EliminationTrainerPage() {
         {/* PHASE: FOCUS */}
         {phase === "focus" && (
           <>
-            <p className="mt-2 text-sm font-bold text-fuchsia-600">Vong 2: Chon Dung/Sai cho tung y</p>
+            <p className="mt-2 text-sm font-bold text-fuchsia-600">Vòng 2: Chọn Đúng/Sai cho từng ý</p>
             <div className="mt-2 space-y-2">
               {q.statements.map((s) => {
                 const conf = confidence[s.id] || "none";
@@ -196,8 +196,8 @@ export function EliminationTrainerPage() {
                     key={s.id}
                     className={`rounded-xl p-3 ${isFocused ? "bg-amber-50 ring-2 ring-amber-300" : "bg-slate-50"}`}
                   >
-                    {isFocused && <span className="text-xs font-bold text-amber-600">⚡ TAP TRUNG Y NAY</span>}
-                    {!isFocused && <span className="text-xs text-emerald-600">✓ Y tu tin</span>}
+                    {isFocused && <span className="text-xs font-bold text-amber-600">⚡ TẬP TRUNG Ý NÀY</span>}
+                    {!isFocused && <span className="text-xs text-emerald-600">✓ Ý tự tin</span>}
                     <p className="font-medium">
                       {s.label} <ChemText text={s.text} />
                     </p>
@@ -206,7 +206,7 @@ export function EliminationTrainerPage() {
                         onClick={() => setAnswer(s.id, true)}
                         className={`flex-1 rounded-lg py-2 font-bold text-white ${chosen === true ? "bg-emerald-700 ring-2 ring-emerald-300" : "bg-emerald-500"}`}
                       >
-                        Dung
+                        Đúng
                       </button>
                       <button
                         onClick={() => setAnswer(s.id, false)}
@@ -223,7 +223,7 @@ export function EliminationTrainerPage() {
               onClick={checkResult}
               className="mt-3 w-full rounded-xl bg-fuchsia-600 p-3 font-bold text-white"
             >
-              ✅ Kiem tra ket qua
+              ✅ Kiểm tra kết quả
             </button>
           </>
         )}
@@ -244,12 +244,12 @@ export function EliminationTrainerPage() {
                       {isCorrect ? "✅" : "❌"} {s.label} <ChemText text={s.text} />
                     </p>
                     <p className="text-xs text-slate-500">
-                      Dap an: <b>{s.correct ? "Dung" : "Sai"}</b>
+                      Đáp án: <b>{s.correct ? "Đúng" : "Sai"}</b>
                       {!isCorrect && conf === "sure" && (
-                        <span className="font-bold text-rose-600"> ← CHAC nhung SAI!</span>
+                        <span className="font-bold text-rose-600"> ← CHẮC nhưng SAI!</span>
                       )}
                       {!isCorrect && (conf === "unsure" || conf === "none") && (
-                        <span className="text-amber-600"> ← Y chua chac - can on them</span>
+                        <span className="text-amber-600"> ← Ý chưa chắc - cần ôn thêm</span>
                       )}
                     </p>
                   </div>
@@ -269,7 +269,7 @@ export function EliminationTrainerPage() {
               onClick={nextQuestion}
               className="mt-3 w-full rounded-xl bg-violet-600 p-3 font-bold text-white"
             >
-              Cau tiep →
+              Câu tiếp →
             </button>
           </>
         )}

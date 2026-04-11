@@ -28,7 +28,7 @@ export function QuestionBuilderPage() {
   const [tfExplanation, setTfExplanation] = useState("");
 
   /* ── Multi true-false fields ── */
-  const [mtfQuestion, setMtfQuestion] = useState("Cho cac nhan dinh sau:");
+  const [mtfQuestion, setMtfQuestion] = useState("Cho các nhận định sau:");
   const [stmts, setStmts] = useState([
     { text: "", correct: true },
     { text: "", correct: true },
@@ -105,7 +105,7 @@ export function QuestionBuilderPage() {
 
     if (type === "true-false") {
       if (!tfStatement.trim()) {
-        setMessage("⚠️ Vui long nhap menh de.");
+        setMessage("⚠️ Vui lòng nhập mệnh đề.");
         return;
       }
       addTf({
@@ -113,32 +113,32 @@ export function QuestionBuilderPage() {
         type: "true-false",
         statement: tfStatement.trim(),
         correct: tfCorrect,
-        explanation: tfExplanation.trim() || "Giao vien chua them giai thich.",
+        explanation: tfExplanation.trim() || "Giáo viên chưa thêm giải thích.",
       });
-      setMessage("✅ Da tao cau Dung/Sai don thanh cong!");
+      setMessage("✅ Đã tạo câu Đúng/Sai đơn thành công!");
       setTfStatement("");
       setTfExplanation("");
       return;
     }
 
     if (stmts.some((s) => !s.text.trim())) {
-      setMessage("⚠️ Vui long nhap du 4 y a, b, c, d.");
+      setMessage("⚠️ Vui lòng nhập đủ 4 ý a, b, c, d.");
       return;
     }
     const labels = ["a.", "b.", "c.", "d."] as const;
     addMtf({
       id: `custom-mtf-${Date.now()}`,
       type: "multi-true-false",
-      question: mtfQuestion.trim() || "Cho cac nhan dinh sau:",
+      question: mtfQuestion.trim() || "Cho các nhận định sau:",
       statements: stmts.map((s, i) => ({
         id: labels[i].replace(".", ""),
         label: labels[i],
         text: s.text.trim(),
         correct: s.correct,
       })),
-      explanation: mtfExplanation.trim() || "Giao vien chua them giai thich.",
+      explanation: mtfExplanation.trim() || "Giáo viên chưa thêm giải thích.",
     });
-    setMessage("✅ Da tao cau 4 y Dung/Sai thanh cong!");
+    setMessage("✅ Đã tạo câu 4 ý Đúng/Sai thành công!");
     setStmts([
       { text: "", correct: true },
       { text: "", correct: true },
@@ -157,10 +157,10 @@ export function QuestionBuilderPage() {
         const result = parseQuestionFile(content);
         setParsedData(result);
         setUploadMsg(
-          `✅ Tim thay: ${result.trueFalse.length} cau don + ${result.multiTrueFalse.length} cau 4 y`,
+          `✅ Tìm thấy: ${result.trueFalse.length} câu đơn + ${result.multiTrueFalse.length} câu 4 ý`,
         );
       } catch {
-        setUploadMsg("⚠️ Loi doc file. Kiem tra lai format.");
+        setUploadMsg("⚠️ Lỗi đọc file. Kiểm tra lại format.");
       }
     };
     reader.readAsText(file, "UTF-8");
@@ -211,13 +211,13 @@ export function QuestionBuilderPage() {
       count++;
     });
 
-    setMessage(`✅ Da nhap thanh cong ${count} cau hoi tu file!`);
+    setMessage(`✅ Đã nhập thành công ${count} câu hỏi từ file!`);
     setParsedData(null);
     setUploadMsg("");
   };
 
   return (
-    <GameShell title="🧪 Tao Cau Hoi" subtitle="Soan cau hoi voi cong thuc hoa hoc dep">
+    <GameShell title="🧪 Tạo Câu Hỏi" subtitle="Soạn câu hỏi với công thức hóa học đẹp">
       {/* ── Tab switcher ── */}
       <div className="mb-3 flex gap-2">
         <button
@@ -226,7 +226,7 @@ export function QuestionBuilderPage() {
             tab === "manual" ? "bg-violet-600 text-white shadow-lg" : "bg-white/80 text-slate-700"
           }`}
         >
-          ✏️ Soan tay
+          ✏️ Soạn tay
         </button>
         <button
           onClick={() => { setTab("upload"); setMessage(""); }}
@@ -234,7 +234,7 @@ export function QuestionBuilderPage() {
             tab === "upload" ? "bg-fuchsia-600 text-white shadow-lg" : "bg-white/80 text-slate-700"
           }`}
         >
-          📁 Tai file len
+          📁 Tải file lên
         </button>
       </div>
 
@@ -249,9 +249,9 @@ export function QuestionBuilderPage() {
               className="flex w-full items-center justify-between"
             >
               <span className="text-sm font-bold text-violet-700">
-                🧪 Cong cu cong thuc hoa hoc {showToolbar ? "▲" : "▼"}
+                🧪 Công cụ công thức hóa học {showToolbar ? "▲" : "▼"}
               </span>
-              <span className="text-xs text-slate-400">Bam o nhap → bam cong thuc</span>
+              <span className="text-xs text-slate-400">Bấm ô nhập → bấm công thức</span>
             </button>
             {showToolbar && (
               <div className="mt-2">
@@ -271,7 +271,7 @@ export function QuestionBuilderPage() {
                   : "bg-white/80 text-slate-700"
               }`}
             >
-              📝 Cau don
+              📝 Câu đơn
             </button>
             <button
               type="button"
@@ -282,7 +282,7 @@ export function QuestionBuilderPage() {
                   : "bg-white/80 text-slate-700"
               }`}
             >
-              📋 Cau 4 y
+              📋 Câu 4 ý
             </button>
           </div>
 
@@ -292,49 +292,49 @@ export function QuestionBuilderPage() {
               /* ── Single True/False ── */
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-bold text-slate-600">Menh de:</label>
+                  <label className="text-sm font-bold text-slate-600">Mệnh đề:</label>
                   <input
                     ref={refCallback("tfStatement") as React.RefCallback<HTMLInputElement>}
                     onFocus={() => handleFocus("tfStatement")}
                     value={tfStatement}
                     onChange={(e) => setTfStatement(e.target.value)}
                     className="mt-1 w-full rounded-xl border-2 border-slate-200 p-3 focus:border-violet-400 focus:outline-none"
-                    placeholder="Vi du: Glucose co cong thuc C6H12O6."
+                    placeholder="Ví dụ: Glucose có công thức C6H12O6."
                   />
                   {tfStatement && (
                     <div className="mt-1 rounded-lg bg-violet-50 p-2 text-sm">
-                      <span className="text-xs text-slate-400">Xem truoc: </span>
+                      <span className="text-xs text-slate-400">Xem trước: </span>
                       <ChemText text={tfStatement} />
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label className="text-sm font-bold text-slate-600">Dap an dung:</label>
+                  <label className="text-sm font-bold text-slate-600">Đáp án đúng:</label>
                   <select
                     value={tfCorrect ? "true" : "false"}
                     onChange={(e) => setTfCorrect(e.target.value === "true")}
                     className="mt-1 w-full rounded-xl border-2 border-slate-200 p-3"
                   >
-                    <option value="true">✅ Dung</option>
+                    <option value="true">✅ Đúng</option>
                     <option value="false">❌ Sai</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-bold text-slate-600">Giai thich:</label>
+                  <label className="text-sm font-bold text-slate-600">Giải thích:</label>
                   <textarea
                     ref={refCallback("tfExplanation") as React.RefCallback<HTMLTextAreaElement>}
                     onFocus={() => handleFocus("tfExplanation")}
                     value={tfExplanation}
                     onChange={(e) => setTfExplanation(e.target.value)}
                     className="mt-1 w-full rounded-xl border-2 border-slate-200 p-3 focus:border-violet-400 focus:outline-none"
-                    placeholder="Giai thich ngan gon ve dap an"
+                    placeholder="Giải thích ngắn gọn về đáp án"
                     rows={2}
                   />
                   {tfExplanation && (
                     <div className="mt-1 rounded-lg bg-violet-50 p-2 text-sm">
-                      <span className="text-xs text-slate-400">Xem truoc: </span>
+                      <span className="text-xs text-slate-400">Xem trước: </span>
                       <ChemText text={tfExplanation} />
                     </div>
                   )}
@@ -344,14 +344,14 @@ export function QuestionBuilderPage() {
               /* ── Multi True/False (4 ý) ── */
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-bold text-slate-600">Cau hoi:</label>
+                  <label className="text-sm font-bold text-slate-600">Câu hỏi:</label>
                   <input
                     ref={refCallback("mtfQuestion") as React.RefCallback<HTMLInputElement>}
                     onFocus={() => handleFocus("mtfQuestion")}
                     value={mtfQuestion}
                     onChange={(e) => setMtfQuestion(e.target.value)}
                     className="mt-1 w-full rounded-xl border-2 border-slate-200 p-3 focus:border-violet-400 focus:outline-none"
-                    placeholder="Cho cac nhan dinh sau:"
+                    placeholder="Cho các nhận định sau:"
                   />
                 </div>
 
@@ -367,7 +367,7 @@ export function QuestionBuilderPage() {
                           value={s.text}
                           onChange={(e) => updateStmt(i, "text", e.target.value)}
                           className="flex-1 rounded-lg border-2 border-slate-200 p-2 focus:border-violet-400 focus:outline-none"
-                          placeholder={`Noi dung y ${label}...`}
+                          placeholder={`Nội dung ý ${label}...`}
                         />
                         <select
                           value={s.correct ? "true" : "false"}
@@ -382,7 +382,7 @@ export function QuestionBuilderPage() {
                         <div className="mt-1 rounded-lg bg-violet-50 p-2 text-sm">
                           <ChemText text={`${label}. ${s.text}`} />
                           <span className="ml-2 text-xs">
-                            {s.correct ? "✅ Dung" : "❌ Sai"}
+                            {s.correct ? "✅ Đúng" : "❌ Sai"}
                           </span>
                         </div>
                       )}
@@ -391,19 +391,19 @@ export function QuestionBuilderPage() {
                 })}
 
                 <div>
-                  <label className="text-sm font-bold text-slate-600">Giai thich chung:</label>
+                  <label className="text-sm font-bold text-slate-600">Giải thích chung:</label>
                   <textarea
                     ref={refCallback("mtfExplanation") as React.RefCallback<HTMLTextAreaElement>}
                     onFocus={() => handleFocus("mtfExplanation")}
                     value={mtfExplanation}
                     onChange={(e) => setMtfExplanation(e.target.value)}
                     className="mt-1 w-full rounded-xl border-2 border-slate-200 p-3 focus:border-violet-400 focus:outline-none"
-                    placeholder="Giai thich cho ca 4 y"
+                    placeholder="Giải thích cho cả 4 ý"
                     rows={2}
                   />
                   {mtfExplanation && (
                     <div className="mt-1 rounded-lg bg-violet-50 p-2 text-sm">
-                      <span className="text-xs text-slate-400">Xem truoc: </span>
+                      <span className="text-xs text-slate-400">Xem trước: </span>
                       <ChemText text={mtfExplanation} />
                     </div>
                   )}
@@ -415,7 +415,7 @@ export function QuestionBuilderPage() {
               type="submit"
               className="mt-4 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 p-3 text-lg font-bold text-white shadow-lg"
             >
-              💾 Luu cau hoi
+              💾 Lưu câu hỏi
             </button>
             {message && (
               <p className="mt-2 rounded-lg bg-emerald-50 p-2 text-sm font-semibold text-emerald-700">
@@ -439,25 +439,25 @@ export function QuestionBuilderPage() {
         <div className="space-y-3">
           {/* Download template */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="text-lg font-black text-violet-700">📄 Buoc 1: Tai mau file</h3>
+            <h3 className="text-lg font-black text-violet-700">📄 Bước 1: Tải mẫu file</h3>
             <p className="mt-1 text-sm text-slate-600">
-              Tai mau, mo bang Word hoac Notepad, soan cau hoi theo format, luu thanh .txt (UTF-8), roi tai len.
+              Tải mẫu, mở bằng Word hoặc Notepad, soạn câu hỏi theo format, lưu thành .txt (UTF-8), rồi tải lên.
             </p>
             <a
               href="/mau-cau-hoi.txt"
               download="mau-cau-hoi.txt"
               className="mt-3 inline-block rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 py-3 font-bold text-white shadow-lg"
             >
-              ⬇️ Tai mau cau hoi (.txt)
+              ⬇️ Tải mẫu câu hỏi (.txt)
             </a>
           </div>
 
           {/* Format guide */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="font-black text-violet-700">📋 Huong dan format</h3>
+            <h3 className="font-black text-violet-700">📋 Hướng dẫn format</h3>
             <div className="mt-2 space-y-2 text-sm">
               <div className="rounded-lg bg-violet-50 p-3">
-                <p className="font-bold text-violet-700">Cau don Dung/Sai:</p>
+                <p className="font-bold text-violet-700">Câu đơn Đúng/Sai:</p>
                 <code className="mt-1 block rounded bg-white p-2 text-xs text-slate-700">
                   [DUNG] H2SO4 la acid manh. | Vi H2SO4 phan li hoan toan.
                 </code>
@@ -467,7 +467,7 @@ export function QuestionBuilderPage() {
               </div>
 
               <div className="rounded-lg bg-fuchsia-50 p-3">
-                <p className="font-bold text-fuchsia-700">Cau 4 y (giua 2 dau ---):</p>
+                <p className="font-bold text-fuchsia-700">Câu 4 ý (giữa 2 dấu ---):</p>
                 <pre className="mt-1 whitespace-pre-wrap rounded bg-white p-2 text-xs text-slate-700">
 {`---
 Cho cac nhan dinh sau:
@@ -481,17 +481,17 @@ Giai thich: Fructose la ketose.
               </div>
 
               <div className="rounded-lg bg-amber-50 p-3">
-                <p className="font-bold text-amber-700">Cong thuc hoa hoc:</p>
-                <p>• Chi so duoi: go binh thuong → H2SO4 hien thi <ChemText text="H2SO4" /></p>
-                <p>• Chi so tren: dung ^{"{...}"} → Fe^{"{2+}"} hien thi <ChemText text="Fe^{2+}" /></p>
-                <p>• Mui ten: {"->"}  hien thi <ChemText text="->" /> | {"<->"}  hien thi <ChemText text="<->" /></p>
+                <p className="font-bold text-amber-700">Công thức hóa học:</p>
+                <p>• Chỉ số dưới: gõ bình thường → H2SO4 hiển thị <ChemText text="H2SO4" /></p>
+                <p>• Chỉ số trên: dùng ^{"{…}"} → Fe^{"{…}"} hiển thị <ChemText text="Fe^{2+}" /></p>
+                <p>• Mũi tên: {"->"} hiển thị <ChemText text="->" /> | {"<->"} hiển thị <ChemText text="<->" /></p>
               </div>
             </div>
           </div>
 
           {/* Upload area */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="text-lg font-black text-violet-700">📁 Buoc 2: Tai file len</h3>
+            <h3 className="text-lg font-black text-violet-700">📁 Bước 2: Tải file lên</h3>
             <div
               className="mt-3 flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-violet-300 bg-violet-50 p-6 transition hover:bg-violet-100"
               onClick={() => fileInputRef.current?.click()}
@@ -502,8 +502,8 @@ Giai thich: Fructose la ketose.
               onDrop={handleDrop}
             >
               <p className="text-4xl">📁</p>
-              <p className="mt-2 font-bold text-violet-700">Keo tha file vao day</p>
-              <p className="text-sm text-slate-500">hoac bam de chon file (.txt)</p>
+              <p className="mt-2 font-bold text-violet-700">Kéo thả file vào đây</p>
+              <p className="text-sm text-slate-500">hoặc bấm để chọn file (.txt)</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -522,12 +522,12 @@ Giai thich: Fructose la ketose.
             {/* Preview parsed data */}
             {parsedData && (
               <div className="mt-3 space-y-2">
-                <h4 className="font-bold text-slate-700">👀 Xem truoc cau hoi:</h4>
+                <h4 className="font-bold text-slate-700">👀 Xem trước câu hỏi:</h4>
 
                 {parsedData.trueFalse.length > 0 && (
                   <div>
                     <p className="text-sm font-bold text-violet-600">
-                      Cau don ({parsedData.trueFalse.length}):
+                      Câu đơn ({parsedData.trueFalse.length}):
                     </p>
                     {parsedData.trueFalse.map((q, i) => (
                       <div key={i} className="mt-1 rounded-lg bg-slate-50 p-2 text-sm">
@@ -548,7 +548,7 @@ Giai thich: Fructose la ketose.
                 {parsedData.multiTrueFalse.length > 0 && (
                   <div>
                     <p className="text-sm font-bold text-fuchsia-600">
-                      Cau 4 y ({parsedData.multiTrueFalse.length}):
+                      Câu 4 ý ({parsedData.multiTrueFalse.length}):
                     </p>
                     {parsedData.multiTrueFalse.map((q, i) => (
                       <div key={i} className="mt-1 rounded-lg bg-slate-50 p-2 text-sm">
@@ -575,7 +575,7 @@ Giai thich: Fructose la ketose.
                   onClick={importAll}
                   className="mt-2 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 p-3 text-lg font-bold text-white shadow-lg"
                 >
-                  📥 Nhap tat ca {(parsedData.trueFalse.length + parsedData.multiTrueFalse.length)} cau hoi
+                  📥 Nhập tất cả {(parsedData.trueFalse.length + parsedData.multiTrueFalse.length)} câu hỏi
                 </button>
               </div>
             )}
@@ -624,13 +624,13 @@ function CustomQuestionList({
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
       <h3 className="font-black text-violet-700">
-        📚 Cau hoi da tao ({customTf.length + customMtf.length})
+        📚 Câu hỏi đã tạo ({customTf.length + customMtf.length})
       </h3>
 
       {customTf.length > 0 && (
         <div className="mt-3">
           <p className="text-xs font-bold text-slate-500">
-            Cau don ({customTf.length}):
+            Câu đơn ({customTf.length}):
           </p>
           {customTf.map((q) => (
             <div
@@ -661,7 +661,7 @@ function CustomQuestionList({
       {customMtf.length > 0 && (
         <div className="mt-3">
           <p className="text-xs font-bold text-slate-500">
-            Cau 4 y ({customMtf.length}):
+            Câu 4 ý ({customMtf.length}):
           </p>
           {customMtf.map((q) => (
             <div key={q.id} className="mt-1 rounded-lg bg-slate-50 p-2">

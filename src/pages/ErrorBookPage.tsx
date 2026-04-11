@@ -24,14 +24,14 @@ export function ErrorBookPage() {
   const checkQuiz = () => {
     const err = errorBook[quizIndex];
     if (quizAnswer === err.correctAnswer) {
-      setQuizResult("✅ Chinh xac! Ban da nho roi.");
+      setQuizResult("✅ Chính xác! Bạn đã nhớ rồi.");
       setQuizScore((s) => ({ correct: s.correct + 1, total: s.total + 1 }));
       removeError(err.id);
       addGold(10);
       addExp(5);
       playCorrect(soundOn);
     } else {
-      setQuizResult(`❌ Sai! Dap an dung: ${err.correctAnswer ? "Dung" : "Sai"}. ${err.explanation}`);
+      setQuizResult(`❌ Sai! Đáp án đúng: ${err.correctAnswer ? "Đúng" : "Sai"}. ${err.explanation}`);
       setQuizScore((s) => ({ ...s, total: s.total + 1 }));
       playWrong(soundOn);
     }
@@ -48,21 +48,21 @@ export function ErrorBookPage() {
   };
 
   return (
-    <GameShell title="📕 So Sai Lam" subtitle="On lai nhung y da sai de khong lap lai">
+    <GameShell title="📕 Sổ Sai Lầm" subtitle="Ôn lại những ý đã sai để không lặp lại">
       <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <p className="font-bold text-violet-700">{errorBook.length} loi sai da ghi nhan</p>
+          <p className="font-bold text-violet-700">{errorBook.length} lỗi sai đã ghi nhận</p>
           {errorBook.length > 0 && (
             <div className="flex gap-2">
               <button
                 onClick={startQuiz}
                 className="rounded-lg bg-violet-600 px-3 py-1 text-sm font-bold text-white"
               >
-                🧠 On lai
+                🧠 Ôn lại
               </button>
               <button onClick={clearErrorBook} className="rounded-lg bg-slate-300 px-3 py-1 text-sm">
-                Xoa het
+                Xóa hết
               </button>
             </div>
           )}
@@ -70,9 +70,9 @@ export function ErrorBookPage() {
 
         {/* Tip */}
         <div className="mt-2 rounded-xl bg-amber-50 p-3 text-sm">
-          <p className="font-bold text-amber-700">💡 Meo hoc:</p>
-          <p>Nao nguoi co xu huong lap lai sai lam cu. On lai cac y sai la cach hieu qua nhat de khong mat diem!</p>
-          <p className="mt-1 font-bold text-rose-600">Nho: Sai 1 y = mat 0.5 diem!</p>
+          <p className="font-bold text-amber-700">💡 Mẹo học:</p>
+          <p>Não người có xu hướng lặp lại sai lầm cũ. Ôn lại các ý sai là cách hiệu quả nhất để không mất điểm!</p>
+          <p className="mt-1 font-bold text-rose-600">Nhớ: Sai 1 ý = mất 0.5 điểm!</p>
         </div>
 
         {/* Quiz mode */}
@@ -80,10 +80,10 @@ export function ErrorBookPage() {
           <div className="mt-4">
             <div className="flex items-center justify-between">
               <p className="text-sm text-slate-500">
-                Cau {quizIndex + 1}/{errorBook.length}
+                Câu {quizIndex + 1}/{errorBook.length}
               </p>
               <p className="text-sm">
-                Dung: <span className="font-bold text-emerald-600">{quizScore.correct}</span> /{" "}
+                Đúng: <span className="font-bold text-emerald-600">{quizScore.correct}</span> /{" "}
                 {quizScore.total}
               </p>
             </div>
@@ -93,9 +93,9 @@ export function ErrorBookPage() {
                 <ChemText text={errorBook[quizIndex].statementText} />
               </p>
               <p className="mt-2 text-xs text-slate-500">
-                Lan truoc ban chon:{" "}
+                Lần trước bạn chọn:{" "}
                 <span className="font-bold text-rose-600">
-                  {errorBook[quizIndex].userAnswer ? "Dung" : "Sai"}
+                  {errorBook[quizIndex].userAnswer ? "Đúng" : "Sai"}
                 </span>{" "}
                 (sai)
               </p>
@@ -106,7 +106,7 @@ export function ErrorBookPage() {
                 onClick={() => setQuizAnswer(true)}
                 className={`flex-1 rounded-xl p-3 font-bold text-white ${quizAnswer === true ? "bg-emerald-700 ring-2" : "bg-emerald-500"}`}
               >
-                Dung
+                Đúng
               </button>
               <button
                 onClick={() => setQuizAnswer(false)}
@@ -121,7 +121,7 @@ export function ErrorBookPage() {
                 onClick={checkQuiz}
                 className="mt-2 w-full rounded-xl bg-violet-600 p-3 font-bold text-white"
               >
-                Kiem tra
+                Kiểm tra
               </button>
             )}
 
@@ -132,7 +132,7 @@ export function ErrorBookPage() {
                   onClick={nextQuiz}
                   className="mt-2 w-full rounded-xl bg-fuchsia-600 p-3 font-bold text-white"
                 >
-                  {quizIndex >= errorBook.length - 1 ? "Hoan thanh" : "Cau tiep →"}
+                  {quizIndex >= errorBook.length - 1 ? "Hoàn thành" : "Câu tiếp →"}
                 </button>
               </>
             )}
@@ -142,8 +142,8 @@ export function ErrorBookPage() {
             {errorBook.length === 0 && (
               <div className="rounded-xl bg-emerald-50 p-4 text-center">
                 <p className="text-2xl">🎉</p>
-                <p className="mt-1 font-bold text-emerald-700">Chua co loi sai nao!</p>
-                <p className="text-sm text-slate-500">Hay lam bai thi thu de bat dau ghi nhan.</p>
+                <p className="mt-1 font-bold text-emerald-700">Chưa có lỗi sai nào!</p>
+                <p className="text-sm text-slate-500">Hãy làm bài thi thử để bắt đầu ghi nhận.</p>
               </div>
             )}
             {errorBook.slice(0, 30).map((err) => (
@@ -152,14 +152,14 @@ export function ErrorBookPage() {
                   <ChemText text={err.statementText} />
                 </p>
                 <p className="text-xs text-slate-500">
-                  Ban chon: <span className="text-rose-600">{err.userAnswer ? "Dung" : "Sai"}</span> → Dap an:{" "}
-                  <span className="text-emerald-600">{err.correctAnswer ? "Dung" : "Sai"}</span>
+                  Bạn chọn: <span className="text-rose-600">{err.userAnswer ? "Đúng" : "Sai"}</span> → Đáp án:{" "}
+                  <span className="text-emerald-600">{err.correctAnswer ? "Đúng" : "Sai"}</span>
                 </p>
                 <p className="text-xs italic text-slate-400">{err.explanation}</p>
               </div>
             ))}
             {errorBook.length > 30 && (
-              <p className="text-center text-sm text-slate-400">... va {errorBook.length - 30} loi khac</p>
+              <p className="text-center text-sm text-slate-400">... và {errorBook.length - 30} lỗi khác</p>
             )}
           </div>
         )}

@@ -27,19 +27,19 @@ export function EndlessRunPage() {
       addGold(15);
       addExp(10);
       playCorrect(soundOn);
-      setResultMessage("Chinh xac! +15 gold");
+      setResultMessage("Chính xác! +15 vàng");
     } else {
       playWrong(soundOn);
-      setResultMessage("Sai roi, co len!");
+      setResultMessage("Sai rồi, cố lên!");
     }
     setLane(value ? "right" : "left");
     setIndex((i) => i + 1);
   };
 
   return (
-    <GameShell title="Duong Chay Vo Cuc" subtitle="Trai = Sai, Phai = Dung">
+    <GameShell title="Đường Chạy Vô Cực" subtitle="Trái = Sai, Phải = Đúng">
       <div className="rounded-3xl bg-white/95 p-5 shadow-xl">
-        <p className="text-sm text-slate-500">Diem: {score}</p>
+        <p className="text-sm text-slate-500">Điểm: {score}</p>
         <div className="relative mt-3 h-16 overflow-hidden rounded-2xl bg-slate-900">
           <div className="absolute inset-0 bg-[linear-gradient(90deg,#1f2937_0%,#1f2937_70%,#374151_100%)]" />
           <motion.div
@@ -57,7 +57,7 @@ export function EndlessRunPage() {
             ⬅ Sai
           </button>
           <button className="rounded-2xl bg-emerald-500 p-4 text-xl font-black text-white" onClick={() => choose(true)}>
-            Dung ➡
+            Đúng ➡
           </button>
         </div>
       </div>

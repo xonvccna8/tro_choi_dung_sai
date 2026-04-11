@@ -10,7 +10,7 @@ export function LoginPage() {
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center p-6">
       <div className="w-full rounded-3xl bg-white/95 p-6 shadow-2xl">
         <h1 className="text-center text-3xl font-black text-violet-700">Chem True/False Quest</h1>
-        <p className="mt-2 text-center text-sm text-slate-600">Chon hoc sinh de bat dau choi moi ngay</p>
+        <p className="mt-2 text-center text-sm text-slate-600">Chọn học sinh để bắt đầu chơi mỗi ngày</p>
         <div className="mt-6 grid grid-cols-2 gap-3">
           {students.map((s) => (
             <button

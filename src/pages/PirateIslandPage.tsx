@@ -32,7 +32,7 @@ export function PirateIslandPage() {
 
   const spinReward = () => {
     if (answer === null) {
-      setSpinMessage("Ban can chon Dung hoac Sai truoc khi quay.");
+      setSpinMessage("Bạn cần chọn Đúng hoặc Sai trước khi quay.");
       return;
     }
     if (answer === tf.correct) {
@@ -43,10 +43,10 @@ export function PirateIslandPage() {
       setBurst((v) => v + 1);
       setConfetti((v) => v + 1);
       playReward(soundOn);
-      setSpinMessage(`Chinh xac! Ban nhan +${value} gold.`);
+      setSpinMessage(`Chính xác! Bạn nhận +${value} vàng.`);
     } else {
       playWrong(soundOn);
-      setSpinMessage("Sai mat roi! Thu lai cau tiep theo.");
+      setSpinMessage("Sai mất rồi! Thử lại câu tiếp theo.");
     }
     setAnswer(null);
     setTfIndex((v) => v + 1);
@@ -78,29 +78,29 @@ export function PirateIslandPage() {
     if (correctCount === 4) {
       setStars((v) => v + 1);
       playCorrect(soundOn);
-      setAttackMessage(`🎉 HOAN HAO 4/4! → ${score}d, +${gold} gold`);
+      setAttackMessage(`🎉 HOÀN HẢO 4/4! → ${score}đ, +${gold} vàng`);
     } else if (correctCount === 3) {
       playWrong(soundOn);
-      setAttackMessage(`⚠️ 3/4 = 0.5d (mat 0.5d!) +${gold} gold. Co gang 4/4!`);
+      setAttackMessage(`⚠️ 3/4 = 0.5đ (mất 0.5đ!) +${gold} vàng. Cố gắng 4/4!`);
     } else {
       playWrong(soundOn);
-      setAttackMessage(`❌ ${scoreLabel(correctCount)} +${gold} gold`);
+      setAttackMessage(`❌ ${scoreLabel(correctCount)} +${gold} vàng`);
     }
     setAttackAnswers({});
     setMtfIndex((v) => v + 1);
   };
 
   return (
-    <GameShell title="Dao Hai Tac" subtitle="Dung/Sai de quay thuong va tan cong">
+    <GameShell title="Đảo Hải Tặc" subtitle="Đúng/Sai để quay thưởng và tấn công">
       <div className="relative rounded-3xl bg-white/95 p-4 shadow-xl">
-        <h2 className="font-black text-violet-700">Cau Dung/Sai don</h2>
+        <h2 className="font-black text-violet-700">Câu Đúng/Sai đơn</h2>
         <p className="mt-2 rounded-xl bg-violet-100 p-3"><ChemText text={tf.statement} /></p>
         <div className="mt-3 flex gap-2">
           <button
             onClick={() => setAnswer(true)}
             className={`flex-1 rounded-xl p-3 font-bold text-white ${answer === true ? "bg-emerald-700 ring-4 ring-emerald-200" : "bg-emerald-500"}`}
           >
-            Dung
+            Đúng
           </button>
           <button
             onClick={() => setAnswer(false)}
@@ -110,7 +110,7 @@ export function PirateIslandPage() {
           </button>
         </div>
         <button onClick={spinReward} className="mt-3 w-full rounded-xl bg-gradient-to-r from-yellow-300 to-orange-400 p-3 font-black">
-          Quay nhan vang
+          Quay nhận vàng
         </button>
         <p className="mt-2 text-sm text-slate-600"><ChemText text={tf.explanation} /></p>
         {spinMessage && <p className="mt-2 rounded-lg bg-violet-100 p-2 text-sm font-semibold text-violet-700">{spinMessage}</p>}
@@ -119,24 +119,24 @@ export function PirateIslandPage() {
       </div>
 
       <div className="relative mt-4 rounded-3xl bg-white/95 p-4 shadow-xl">
-        <h2 className="font-black text-violet-700">Tan cong boss (4 y Dung/Sai)</h2>
+        <h2 className="font-black text-violet-700">Tấn công boss (4 ý Đúng/Sai)</h2>
         <p className="mt-2">{mtf.question}</p>
         <div className="mt-3 space-y-2">
           {mtf.statements.map((s) => (
             <div key={s.id} className="rounded-xl bg-slate-100 p-3">
               <p className="font-semibold">{s.label} <ChemText text={s.text} /></p>
               <div className="mt-2 flex gap-2">
-                <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: true }))} className="rounded-lg bg-emerald-500 px-3 py-1 text-white">Dung</button>
+                <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: true }))} className="rounded-lg bg-emerald-500 px-3 py-1 text-white">Đúng</button>
                 <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: false }))} className="rounded-lg bg-rose-500 px-3 py-1 text-white">Sai</button>
               </div>
               {attackAnswers[s.id] !== undefined && (
-                <p className="mt-1 text-xs text-slate-600">Da chon: {attackAnswers[s.id] ? "Dung" : "Sai"}</p>
+                <p className="mt-1 text-xs text-slate-600">Đã chọn: {attackAnswers[s.id] ? "Đúng" : "Sai"}</p>
               )}
             </div>
           ))}
         </div>
         <button onClick={finishAttack} className="mt-3 w-full rounded-xl bg-gradient-to-r from-fuchsia-400 to-violet-500 p-3 font-black text-white">
-          Ket thuc tan cong
+          Kết thúc tấn công
         </button>
         <p className="mt-2 text-sm text-slate-600"><ChemText text={mtf.explanation} /></p>
         {attackMessage && <p className="mt-2 rounded-lg bg-fuchsia-100 p-2 text-sm font-semibold text-fuchsia-700">{attackMessage}</p>}

@@ -7,10 +7,10 @@ export function DailyMissionPage() {
   const addGold = useGameStore((s) => s.addGold);
 
   return (
-    <GameShell title="Daily Mission" subtitle="Duy tri thoi quen hoc moi ngay">
+    <GameShell title="Nhiệm Vụ Hằng Ngày" subtitle="Duy trì thói quen học mỗi ngày">
       <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-        <div className="rounded-2xl bg-violet-100 p-3">1) Hoan thanh 1 cau Dung/Sai don</div>
-        <div className="mt-2 rounded-2xl bg-pink-100 p-3">2) Hoan thanh 1 cau 4 y Dung/Sai</div>
+        <div className="rounded-2xl bg-violet-100 p-3">1) Hoàn thành 1 câu Đúng/Sai đơn</div>
+        <div className="mt-2 rounded-2xl bg-pink-100 p-3">2) Hoàn thành 1 câu 4 ý Đúng/Sai</div>
         <button
           className="mt-3 w-full rounded-xl bg-emerald-500 p-3 font-bold text-white"
           onClick={() => {
@@ -18,10 +18,10 @@ export function DailyMissionPage() {
             addGold(60);
           }}
         >
-          Nhan thuong ngay
+          Nhận thưởng ngày
         </button>
         <Link className="mt-3 block text-center text-sm text-violet-700 underline" to="/dashboard">
-          Ve dashboard
+          Về trang chủ
         </Link>
       </div>
     </GameShell>

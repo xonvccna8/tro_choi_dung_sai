@@ -5,68 +5,68 @@ import { Link } from "react-router-dom";
 const strategies = [
   {
     icon: "📊",
-    title: "Hieu thang diem that",
-    desc: "Dung 3/4 chi duoc 0.5d, dung 4/4 duoc 1.0d. Sai 1 y = mat 0.5d! Vi vay PHAI can than tung y, dung voi vang.",
-    tip: "Hay danh them 30 giay kiem tra lai y ban chua chac chan. 30 giay do co the cuu 0.5 diem!",
+    title: "Hiểu thang điểm thật",
+    desc: "Đúng 3/4 chỉ được 0.5đ, đúng 4/4 được 1.0đ. Sai 1 ý = mất 0.5đ! Vì vậy PHẢI cẩn thận từng ý, đừng vội vàng.",
+    tip: "Hãy dành thêm 30 giây kiểm tra lại ý bạn chưa chắc chắn. 30 giây đó có thể cứu 0.5 điểm!",
     game: "/game/exam",
-    gameName: "Thi Thu That",
+    gameName: "Thi Thử Thật",
   },
   {
     icon: "🎯",
-    title: "Phuong phap Loai Tru 2 Vong",
-    desc: "Vong 1: Nhanh chong danh dau y ban CHAC CHAN biet. Vong 2: Don toan bo suy nghi vao y CHUA CHAC.",
-    tip: "Thuong ban tu tin 2-3 y/cau. Tap trung vao 1-2 y con lai se tang ty le 4/4 dang ke.",
+    title: "Phương pháp Loại Trừ 2 Vòng",
+    desc: "Vòng 1: Nhanh chóng đánh dấu ý bạn CHẮC CHẮN biết. Vòng 2: Dồn toàn bộ suy nghĩ vào ý CHƯA CHẮC.",
+    tip: "Thường bạn tự tin 2-3 ý/câu. Tập trung vào 1-2 ý còn lại sẽ tăng tỷ lệ 4/4 đáng kể.",
     game: "/game/eliminate",
-    gameName: "Luyen Loai Tru",
+    gameName: "Luyện Loại Trừ",
   },
   {
     icon: "⚡",
-    title: "Luyen toc do tung y",
-    desc: "Moi y Dung/Sai can doc ky va xu ly trong ~30 giay. Luyen nhieu y rieng le giup tang toc va tu tin.",
-    tip: "Chay Endless Run moi ngay 10 phut, muc tieu 20+ y/phut voi do chinh xac >85%.",
+    title: "Luyện tốc độ từng ý",
+    desc: "Mỗi ý Đúng/Sai cần đọc kỹ và xử lý trong ~30 giây. Luyện nhiều ý riêng lẻ giúp tăng tốc và tự tin.",
+    tip: "Chạy Đường Chạy Vô Cực mỗi ngày 10 phút, mục tiêu 20+ ý/phút với độ chính xác >85%.",
     game: "/game/run",
-    gameName: "Duong Chay Vo Cuc",
+    gameName: "Đường Chạy Vô Cực",
   },
   {
     icon: "📕",
-    title: "On lai loi sai",
-    desc: "Nao nguoi co xu huong lap lai sai lam cu. Ghi nhan va on lai nhung y da sai la cach hieu qua nhat.",
-    tip: "Sau moi bai thi thu, mo So Sai Lam va on lai TAT CA cac y sai. Lap lai den khi khong con loi.",
+    title: "Ôn lại lỗi sai",
+    desc: "Não người có xu hướng lặp lại sai lầm cũ. Ghi nhận và ôn lại những ý đã sai là cách hiệu quả nhất.",
+    tip: "Sau mỗi bài thi thử, mở Sổ Sai Lầm và ôn lại TẤT CẢ các ý sai. Lặp lại đến khi không còn lỗi.",
     game: "/game/errors",
-    gameName: "So Sai Lam",
+    gameName: "Sổ Sai Lầm",
   },
   {
     icon: "🔑",
-    title: "Nhan dien tu khoa bay",
-    desc: "Cac tu nhu 'chi', 'luon luon', 'tat ca', 'khong bao gio', 'duy nhat' thuong la BAY. Menh de tuyet doi thuong SAI.",
-    tip: "Khi thay tu tuyet doi, hay tu hoi: 'Co ngoai le nao khong?' Neu co 1 ngoai le → menh de SAI.",
+    title: "Nhận diện từ khóa bẫy",
+    desc: "Các từ như 'chỉ', 'luôn luôn', 'tất cả', 'không bao giờ', 'duy nhất' thường là BẪY. Mệnh đề tuyệt đối thường SAI.",
+    tip: "Khi thấy từ tuyệt đối, hãy tự hỏi: 'Có ngoại lệ nào không?' Nếu có 1 ngoại lệ → mệnh đề SAI.",
     game: "/game/pirate",
-    gameName: "Dao Hai Tac",
+    gameName: "Đảo Hải Tặc",
   },
   {
     icon: "🧠",
-    title: "Xu ly tung y DOC LAP",
-    desc: "Dung de dap an y a anh huong y b. Moi y la mot menh de rieng biet. Doc va xet dung/sai RIENG tung y.",
-    tip: "Che cac y khac, chi doc 1 y tai 1 thoi diem. Quyet dinh xong moi chuyen y tiep.",
+    title: "Xử lý từng ý ĐỘC LẬP",
+    desc: "Đừng để đáp án ý a ảnh hưởng ý b. Mỗi ý là một mệnh đề riêng biệt. Đọc và xét đúng/sai RIÊNG từng ý.",
+    tip: "Che các ý khác, chỉ đọc 1 ý tại 1 thời điểm. Quyết định xong mới chuyển ý tiếp.",
     game: "/game/eliminate",
-    gameName: "Luyen Loai Tru",
+    gameName: "Luyện Loại Trừ",
   },
 ];
 
 export function StrategyGuidePage() {
   return (
-    <GameShell title="📖 Cam Nang Chien Thuat" subtitle="6 phuong phap lam Dung/Sai hieu qua">
+    <GameShell title="📖 Cẩm Nang Chiến Thuật" subtitle="6 phương pháp làm Đúng/Sai hiệu quả">
       {/* Scoring table */}
       <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-        <h2 className="text-lg font-black text-rose-600">⚠️ Bang diem that - Hieu de khong mat diem oan!</h2>
+        <h2 className="text-lg font-black text-rose-600">⚠️ Bảng điểm thật - Hiểu để không mất điểm oan!</h2>
         <div className="mt-3 overflow-hidden rounded-xl border">
           <table className="w-full text-sm">
             <thead className="bg-violet-100">
               <tr>
-                <th className="p-2 text-left">So y dung</th>
-                <th className="p-2">Diem nhan</th>
-                <th className="p-2">Diem mat</th>
-                <th className="p-2">Nhan xet</th>
+                <th className="p-2 text-left">Số ý đúng</th>
+                <th className="p-2">Điểm nhận</th>
+                <th className="p-2">Điểm mất</th>
+                <th className="p-2">Nhận xét</th>
               </tr>
             </thead>
             <tbody>
@@ -78,14 +78,14 @@ export function StrategyGuidePage() {
                   }
                 >
                   <td className="p-2">{n}/4</td>
-                  <td className="p-2 text-center">{calcRealScore(n)}d</td>
-                  <td className="p-2 text-center text-rose-600">{(1 - calcRealScore(n)).toFixed(2)}d</td>
+                  <td className="p-2 text-center">{calcRealScore(n)}đ</td>
+                  <td className="p-2 text-center text-rose-600">{(1 - calcRealScore(n)).toFixed(2)}đ</td>
                   <td className="p-2 text-xs">
-                    {n === 0 && "💀 Mat tron"}
-                    {n === 1 && "😱 Gan nhu mat tron"}
-                    {n === 2 && "😥 Mat 3/4 so diem"}
-                    {n === 3 && "⚠️ SAI 1 Y = MAT 0.5D!"}
-                    {n === 4 && "⭐ Hoan hao!"}
+                    {n === 0 && "💀 Mất trọn"}
+                    {n === 1 && "😱 Gần như mất trọn"}
+                    {n === 2 && "😥 Mất 3/4 số điểm"}
+                    {n === 3 && "⚠️ SAI 1 Ý = MẤT 0.5Đ!"}
+                    {n === 4 && "⭐ Hoàn hảo!"}
                   </td>
                 </tr>
               ))}
@@ -94,38 +94,38 @@ export function StrategyGuidePage() {
         </div>
         <div className="mt-3 rounded-lg bg-rose-100 p-3 text-center">
           <p className="text-sm font-bold text-rose-700">
-            4 cau × sai 1 y/cau = mat 2.0 diem tren tong 4.0!
+            4 câu × sai 1 ý/câu = mất 2.0 điểm trên tổng 4.0!
           </p>
-          <p className="text-xs text-rose-600">(chi con 2.0d thay vi 4.0d)</p>
+          <p className="text-xs text-rose-600">(chỉ còn 2.0đ thay vì 4.0đ)</p>
         </div>
 
         {/* Visual example */}
         <div className="mt-4 rounded-xl bg-slate-50 p-3">
-          <p className="text-sm font-bold text-violet-700">📋 Vi du thuc te:</p>
+          <p className="text-sm font-bold text-violet-700">📋 Ví dụ thực tế:</p>
           <div className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between rounded bg-yellow-100 p-1 px-2">
-              <span>Cau 1: ✅ ✅ ❌ ✅ → 3/4</span>
-              <span className="font-bold text-yellow-700">0.5d (mat 0.5d)</span>
+              <span>Câu 1: ✅ ✅ ❌ ✅ → 3/4</span>
+              <span className="font-bold text-yellow-700">0.5đ (mất 0.5đ)</span>
             </div>
             <div className="flex justify-between rounded bg-emerald-100 p-1 px-2">
-              <span>Cau 2: ✅ ✅ ✅ ✅ → 4/4</span>
-              <span className="font-bold text-emerald-700">1.0d ⭐</span>
+              <span>Câu 2: ✅ ✅ ✅ ✅ → 4/4</span>
+              <span className="font-bold text-emerald-700">1.0đ ⭐</span>
             </div>
             <div className="flex justify-between rounded bg-orange-100 p-1 px-2">
-              <span>Cau 3: ✅ ❌ ✅ ❌ → 2/4</span>
-              <span className="font-bold text-orange-700">0.25d (mat 0.75d)</span>
+              <span>Câu 3: ✅ ❌ ✅ ❌ → 2/4</span>
+              <span className="font-bold text-orange-700">0.25đ (mất 0.75đ)</span>
             </div>
             <div className="flex justify-between rounded bg-emerald-100 p-1 px-2">
-              <span>Cau 4: ✅ ✅ ✅ ✅ → 4/4</span>
-              <span className="font-bold text-emerald-700">1.0d ⭐</span>
+              <span>Câu 4: ✅ ✅ ✅ ✅ → 4/4</span>
+              <span className="font-bold text-emerald-700">1.0đ ⭐</span>
             </div>
             <div className="flex justify-between rounded bg-violet-100 p-1 px-2 font-bold">
-              <span>Tong</span>
-              <span>2.75 / 4.0d</span>
+              <span>Tổng</span>
+              <span>2.75 / 4.0đ</span>
             </div>
           </div>
           <p className="mt-2 text-xs text-slate-600">
-            → Neu cau 1 va cau 3 dung het: 4.0d! Chi sai 3 y ma mat 1.25d.
+            → Nếu câu 1 và câu 3 đúng hết: 4.0đ! Chỉ sai 3 ý mà mất 1.25đ.
           </p>
         </div>
       </div>
@@ -138,35 +138,35 @@ export function StrategyGuidePage() {
           </h3>
           <p className="mt-2 text-sm">{s.desc}</p>
           <p className="mt-2 rounded-lg bg-amber-50 p-2 text-sm">
-            💡 <b>Meo:</b> {s.tip}
+            💡 <b>Mẹo:</b> {s.tip}
           </p>
           <Link
             to={s.game}
             className="mt-2 inline-block rounded-lg bg-violet-600 px-4 py-2 text-sm font-bold text-white"
           >
-            Luyen tap: {s.gameName} →
+            Luyện tập: {s.gameName} →
           </Link>
         </div>
       ))}
 
       {/* Quick guide */}
       <div className="mt-4 rounded-3xl bg-gradient-to-r from-violet-100 to-fuchsia-100 p-4 shadow-xl">
-        <h3 className="font-black text-violet-700">🗺️ Lo trinh on tap khuyen nghi</h3>
+        <h3 className="font-black text-violet-700">🗺️ Lộ trình ôn tập khuyến nghị</h3>
         <div className="mt-2 space-y-2 text-sm">
           <p>
-            <b>Buoc 1:</b> Doc Cam Nang → hieu thang diem va chien thuat
+            <b>Bước 1:</b> Đọc Cẩm Nang → hiểu thang điểm và chiến thuật
           </p>
           <p>
-            <b>Buoc 2:</b> Chay Endless Run 10 phut/ngay → tang phan xa
+            <b>Bước 2:</b> Chạy Đường Chạy Vô Cực 10 phút/ngày → tăng phản xạ
           </p>
           <p>
-            <b>Buoc 3:</b> Luyen Loai Tru 5 cau/ngay → master phuong phap 2 vong
+            <b>Bước 3:</b> Luyện Loại Trừ 5 câu/ngày → master phương pháp 2 vòng
           </p>
           <p>
-            <b>Buoc 4:</b> Thi Thu That 1 lan/ngay → mo phong ap luc thi
+            <b>Bước 4:</b> Thi Thử Thật 1 lần/ngày → mô phỏng áp lực thi
           </p>
           <p>
-            <b>Buoc 5:</b> On So Sai Lam sau moi lan thi → khong lap lai loi
+            <b>Bước 5:</b> Ôn Sổ Sai Lầm sau mỗi lần thi → không lặp lại lỗi
           </p>
         </div>
       </div>

@@ -18,7 +18,7 @@ const categories = [
     ],
   },
   {
-    label: "Muoi & Oxit",
+    label: "Muối & Oxit",
     items: [
       { display: "NaCl", insert: "NaCl" },
       { display: "CaCO3", insert: "CaCO3" },
@@ -35,7 +35,7 @@ const categories = [
     ],
   },
   {
-    label: "Huu co",
+    label: "Hữu cơ",
     items: [
       { display: "CH4", insert: "CH4" },
       { display: "C2H4", insert: "C2H4" },
@@ -71,7 +71,7 @@ const categories = [
     ],
   },
   {
-    label: "Ky hieu dac biet",
+    label: "Ký hiệu đặc biệt",
     items: [
       { display: "→", insert: " -> " },
       { display: "⇌", insert: " <-> " },
@@ -93,7 +93,7 @@ export function FormulaToolbar({ onInsert }: Props) {
   return (
     <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
       <p className="text-xs font-bold text-slate-500">
-        🧪 Bam vao o nhap truoc → bam cong thuc de chen:
+        🧪 Bấm vào ô nhập trước → bấm công thức để chèn:
       </p>
       {categories.map((cat) => (
         <div key={cat.label}>

@@ -153,30 +153,30 @@ export function ExamSimulatorPage() {
   const totalStatements = questions.length * 4;
 
   return (
-    <GameShell title="📝 Thi Thu That" subtitle="Mo phong de thi Hoa - 4 cau Dung/Sai">
+    <GameShell title="📝 Thi Thử Thật" subtitle="Mô phỏng đề thi Hoá - 4 câu Đúng/Sai">
       {/* ── IDLE ── */}
       {phase === "idle" && (
         <div className="rounded-3xl bg-white/95 p-5 shadow-xl">
-          <h2 className="text-xl font-black text-violet-700">Quy tac thi</h2>
+          <h2 className="text-xl font-black text-violet-700">Quy tắc thi</h2>
           <div className="mt-3 space-y-2 text-sm">
-            <p>📌 <b>4 cau hoi</b>, moi cau <b>4 nhan dinh</b> Dung/Sai</p>
-            <p>⏱️ Thoi gian: <b>8 phut</b> (giong thi that)</p>
-            <p className="font-bold text-rose-600">📊 Thang diem moi cau (toi da 1.0d):</p>
+            <p>📌 <b>4 câu hỏi</b>, mỗi câu <b>4 nhận định</b> Đúng/Sai</p>
+            <p>⏱️ Thời gian: <b>8 phút</b> (giống thi thật)</p>
+            <p className="font-bold text-rose-600">📊 Thang điểm mỗi câu (tối đa 1.0đ):</p>
             <div className="rounded-xl bg-gradient-to-r from-red-50 to-emerald-50 p-3">
-              <p>• Dung <b>1</b> y → <span className="font-bold text-red-600">0.1d</span></p>
-              <p>• Dung <b>2</b> y → <span className="font-bold text-orange-600">0.25d</span></p>
-              <p>• Dung <b>3</b> y → <span className="font-bold text-yellow-600">0.5d</span> <span className="text-red-500">(mat 0.5d!)</span></p>
-              <p>• Dung <b>4</b> y → <span className="font-bold text-emerald-600">1.0d</span> ⭐</p>
+              <p>• Đúng <b>1</b> ý → <span className="font-bold text-red-600">0.1đ</span></p>
+              <p>• Đúng <b>2</b> ý → <span className="font-bold text-orange-600">0.25đ</span></p>
+              <p>• Đúng <b>3</b> ý → <span className="font-bold text-yellow-600">0.5đ</span> <span className="text-red-500">(mất 0.5đ!)</span></p>
+              <p>• Đúng <b>4</b> ý → <span className="font-bold text-emerald-600">1.0đ</span> ⭐</p>
             </div>
             <p className="rounded-lg bg-rose-100 p-2 font-bold text-rose-700">
-              ⚠️ Chi sai 1 y = mat 0.5 diem! Hay can than tung y!
+              ⚠️ Chỉ sai 1 ý = mất 0.5 điểm! Hãy cẩn thận từng ý!
             </p>
           </div>
           <button
             onClick={startExam}
             className="mt-4 w-full rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 p-4 text-lg font-black text-white shadow-lg"
           >
-            🚀 Bat dau thi
+            🚀 Bắt đầu thi
           </button>
 
           {/* Exam history */}
@@ -191,9 +191,9 @@ export function ExamSimulatorPage() {
           <div className="sticky top-0 z-10 rounded-2xl bg-white/95 p-3 shadow-lg">
             <div className="flex items-center justify-between">
               <span className={`font-bold ${timeLeft < 60 ? "text-rose-600 animate-pulse" : ""}`}>⏱️ {fmt(timeLeft)}</span>
-              <span className="text-sm">{answeredCount}/{totalStatements} y da chon</span>
+              <span className="text-sm">{answeredCount}/{totalStatements} ý đã chọn</span>
               <button onClick={doSubmit} className="rounded-xl bg-rose-500 px-4 py-2 font-bold text-white">
-                Nop bai
+                Nộp bài
               </button>
             </div>
             <div className="mt-2 h-2 rounded-full bg-slate-200">
@@ -203,14 +203,14 @@ export function ExamSimulatorPage() {
               />
             </div>
             {timeLeft < 60 && (
-              <p className="mt-1 animate-pulse text-center text-sm font-bold text-rose-600">⚠️ Con duoi 1 phut!</p>
+              <p className="mt-1 animate-pulse text-center text-sm font-bold text-rose-600">⚠️ Còn dưới 1 phút!</p>
             )}
           </div>
 
           {/* Questions */}
           {questions.map((q, qi) => (
             <div key={q.id} className="rounded-3xl bg-white/95 p-4 shadow-xl">
-              <h3 className="font-black text-violet-700">Cau {qi + 1}/4</h3>
+              <h3 className="font-black text-violet-700">Câu {qi + 1}/4</h3>
               <p className="mt-1 text-sm">
                 <ChemText text={q.question} />
               </p>
@@ -227,7 +227,7 @@ export function ExamSimulatorPage() {
                           onClick={() => pickAnswer(q.id, s.id, true)}
                           className={`flex-1 rounded-lg py-2 font-bold text-white transition ${chosen === true ? "bg-emerald-700 ring-2 ring-emerald-300" : "bg-emerald-500"}`}
                         >
-                          Dung
+                          Đúng
                         </button>
                         <button
                           onClick={() => pickAnswer(q.id, s.id, false)}
@@ -247,7 +247,7 @@ export function ExamSimulatorPage() {
             onClick={doSubmit}
             className="w-full rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 p-4 text-lg font-black text-white"
           >
-            ✅ Nop bai
+            ✅ Nộp bài
           </button>
         </div>
       )}
@@ -257,7 +257,7 @@ export function ExamSimulatorPage() {
         <div className="relative space-y-4">
           {/* Score overview */}
           <div className="rounded-3xl bg-white/95 p-5 shadow-xl text-center">
-            <h2 className="text-2xl font-black text-violet-700">📊 Ket qua thi</h2>
+            <h2 className="text-2xl font-black text-violet-700">📊 Kết quả thi</h2>
             <p className="mt-2 text-4xl font-black">
               <span
                 className={
@@ -272,9 +272,9 @@ export function ExamSimulatorPage() {
               </span>
               <span className="text-2xl text-slate-400"> / {result.maxScore}.0d</span>
             </p>
-            <p className="mt-1 text-sm text-slate-500">Thoi gian: {fmt(result.timeSpent)}</p>
+            <p className="mt-1 text-sm text-slate-500">Thời gian: {fmt(result.timeSpent)}</p>
             <p className="text-sm text-slate-500">
-              Mat: <span className="font-bold text-rose-600">{(result.maxScore - result.totalScore).toFixed(2)}d</span>
+              Mất: <span className="font-bold text-rose-600">{(result.maxScore - result.totalScore).toFixed(2)}đ</span>
             </p>
             <p className="mt-1 text-sm">
               Gold: <span className="font-bold text-amber-600">+{Math.round(result.totalScore * 80)}</span> | EXP:{" "}
@@ -296,7 +296,7 @@ export function ExamSimulatorPage() {
             return (
               <div key={q.id} className={`rounded-3xl border-2 p-4 shadow ${bgColor}`}>
                 <div className="flex items-center justify-between">
-                  <h3 className="font-black">Cau {qi + 1}</h3>
+                  <h3 className="font-black">Câu {qi + 1}</h3>
                   <span className="text-sm font-bold">{scoreLabel(qr.correctCount)}</span>
                 </div>
                 <div className="mt-2 space-y-1">
@@ -314,8 +314,8 @@ export function ExamSimulatorPage() {
                             {s.label} <ChemText text={s.text} />
                           </p>
                           <p className="text-xs text-slate-500">
-                            Ban chon: <b>{userAns === undefined ? "Chua chon" : userAns ? "Dung" : "Sai"}</b> | Dap an:{" "}
-                            <b>{s.correct ? "Dung" : "Sai"}</b>
+                            Bạn chọn: <b>{userAns === undefined ? "Chưa chọn" : userAns ? "Đúng" : "Sai"}</b> | Đáp án:{" "}
+                            <b>{s.correct ? "Đúng" : "Sai"}</b>
                           </p>
                         </div>
                       </div>
@@ -331,28 +331,28 @@ export function ExamSimulatorPage() {
 
           {/* Analysis */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="font-black text-violet-700">💡 Phan tich</h3>
+            <h3 className="font-black text-violet-700">💡 Phân tích</h3>
             {result.questions.filter((r) => r.correctCount === 3).length > 0 && (
               <p className="mt-2 rounded-lg bg-yellow-100 p-2 text-sm">
-                ⚠️ Ban co <b>{result.questions.filter((r) => r.correctCount === 3).length}</b> cau dung 3/4 → mat{" "}
-                <b>{(result.questions.filter((r) => r.correctCount === 3).length * 0.5).toFixed(1)}d</b>! Chi can
-                dung them 1 y moi cau se duoc them{" "}
-                {(result.questions.filter((r) => r.correctCount === 3).length * 0.5).toFixed(1)}d.
+                ⚠️ Bạn có <b>{result.questions.filter((r) => r.correctCount === 3).length}</b> câu đúng 3/4 → mất{" "}
+                <b>{(result.questions.filter((r) => r.correctCount === 3).length * 0.5).toFixed(1)}đ</b>! Chỉ cần
+                đúng thêm 1 ý mỗi câu sẽ được thêm{" "}
+                {(result.questions.filter((r) => r.correctCount === 3).length * 0.5).toFixed(1)}đ.
               </p>
             )}
             {result.questions.filter((r) => r.correctCount === 4).length > 0 && (
               <p className="mt-2 rounded-lg bg-emerald-100 p-2 text-sm">
-                ⭐ Xuat sac! <b>{result.questions.filter((r) => r.correctCount === 4).length}</b> cau hoan hao 4/4!
+                ⭐ Xuất sắc! <b>{result.questions.filter((r) => r.correctCount === 4).length}</b> câu hoàn hảo 4/4!
               </p>
             )}
             {result.questions.filter((r) => r.correctCount <= 2).length > 0 && (
               <p className="mt-2 rounded-lg bg-rose-100 p-2 text-sm">
-                ❌ Co <b>{result.questions.filter((r) => r.correctCount <= 2).length}</b> cau duoi 3/4 → can on lai kien
-                thuc. Xem So Sai Lam!
+                ❌ Có <b>{result.questions.filter((r) => r.correctCount <= 2).length}</b> câu dưới 3/4 → cần ôn lại kiến
+                thức. Xem Sổ Sai Lầm!
               </p>
             )}
             <p className="mt-2 text-sm text-slate-600">
-              Cac y sai da duoc luu vao <b>📕 So Sai Lam</b> de ban on lai.
+              Các ý sai đã được lưu vào <b>📕 Sổ Sai Lầm</b> để bạn ôn lại.
             </p>
           </div>
 
@@ -360,7 +360,7 @@ export function ExamSimulatorPage() {
             onClick={startExam}
             className="w-full rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 p-4 font-black text-white"
           >
-            🔄 Thi lai
+            🔄 Thi lại
           </button>
           <ConfettiRain trigger={confetti} />
           <StarBlast trigger={stars} />
@@ -377,7 +377,7 @@ function ExamHistory() {
   const recent = examHistory.slice(0, 5);
   return (
     <div className="mt-4">
-      <h3 className="font-bold text-violet-700">📜 Lich su thi gan day</h3>
+      <h3 className="font-bold text-violet-700">📜 Lịch sử thi gần đây</h3>
       <div className="mt-2 space-y-1">
         {recent.map((e) => (
           <div key={e.id} className="flex items-center justify-between rounded-lg bg-slate-50 p-2 text-sm">
