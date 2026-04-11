@@ -6,7 +6,6 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { EliminationTrainerPage } from "./pages/EliminationTrainerPage";
 import { EndlessRunPage } from "./pages/EndlessRunPage";
 import { ErrorBookPage } from "./pages/ErrorBookPage";
-import { ExamSimulatorPage } from "./pages/ExamSimulatorPage";
 import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -49,7 +48,6 @@ export default function App() {
         <Route path="/game/pirate" element={<GuardedRoute><PirateIslandPage /></GuardedRoute>} />
         <Route path="/game/run" element={<GuardedRoute><EndlessRunPage /></GuardedRoute>} />
         <Route path="/game/box" element={<GuardedRoute><BlindBoxPage /></GuardedRoute>} />
-        <Route path="/game/exam" element={<GuardedRoute><ExamSimulatorPage /></GuardedRoute>} />
         <Route path="/game/arena" element={<GuardedRoute><ChemArenaPage /></GuardedRoute>} />
         <Route path="/game/eliminate" element={<GuardedRoute><EliminationTrainerPage /></GuardedRoute>} />
         <Route path="/game/errors" element={<GuardedRoute><ErrorBookPage /></GuardedRoute>} />

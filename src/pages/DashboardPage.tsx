@@ -11,12 +11,6 @@ const examModes = [
     big: true,
   },
   {
-    to: "/game/exam",
-    title: "📝 Thi Thử Thật",
-    desc: "4 câu × 4 ý, timer 8 phút, điểm thật",
-    color: "from-violet-400 to-fuchsia-500",
-  },
-  {
     to: "/game/eliminate",
     title: "🎯 Luyện Loại Trừ",
     desc: "PP 2 vòng: Chắc → Tập trung",
