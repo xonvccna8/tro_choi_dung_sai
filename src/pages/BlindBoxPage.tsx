@@ -85,7 +85,7 @@ export function BlindBoxPage() {
                       : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                   }`}
                 >
-                  ✅ Đúng
+                    Đúng
                 </button>
                 <button
                   onClick={() => setAnswerMap((v) => ({ ...v, [s.id]: false }))}
@@ -95,7 +95,7 @@ export function BlindBoxPage() {
                       : "bg-rose-50 text-rose-700 hover:bg-rose-100"
                   }`}
                 >
-                  ❌ Sai
+                    Sai
                 </button>
               </div>
             </div>

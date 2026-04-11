@@ -322,8 +322,8 @@ export function QuestionBuilderPage() {
                     onChange={(e) => setTfCorrect(e.target.value === "true")}
                     className="mt-1 w-full rounded-xl border-2 border-slate-200 p-3"
                   >
-                    <option value="true">✅ Đúng</option>
-                    <option value="false">❌ Sai</option>
+                      <option value="true">Đúng</option>
+                      <option value="false">Sai</option>
                   </select>
                 </div>
 
@@ -380,15 +380,15 @@ export function QuestionBuilderPage() {
                           onChange={(e) => updateStmt(i, "correct", e.target.value === "true")}
                           className="rounded-lg border-2 border-slate-200 p-2 text-sm"
                         >
-                          <option value="true">✅ D</option>
-                          <option value="false">❌ S</option>
+                            <option value="true">Đ</option>
+                            <option value="false">S</option>
                         </select>
                       </div>
                       {s.text && (
                         <div className="mt-1 rounded-lg bg-violet-50 p-2 text-sm">
                           <ChemText text={`${label}. ${s.text}`} />
                           <span className="ml-2 text-xs">
-                            {s.correct ? "✅ Đúng" : "❌ Sai"}
+                              {s.correct ? "Đúng" : "Sai"}
                           </span>
                         </div>
                       )}

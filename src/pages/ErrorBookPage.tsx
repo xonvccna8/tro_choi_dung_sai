@@ -31,7 +31,7 @@ export function ErrorBookPage() {
       addExp(5);
       playCorrect(soundOn);
     } else {
-      setQuizResult(`❌ Sai! Đáp án đúng: ${err.correctAnswer ? "Đúng" : "Sai"}. ${err.explanation}`);
+         setQuizResult(`Sai! Đáp án đúng: ${err.correctAnswer ? "Đúng" : "Sai"}. ${err.explanation}`);
       setQuizScore((s) => ({ ...s, total: s.total + 1 }));
       playWrong(soundOn);
     }

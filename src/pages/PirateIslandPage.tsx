@@ -126,8 +126,8 @@ export function PirateIslandPage() {
             <div key={s.id} className="rounded-xl bg-slate-100 p-3">
               <p className="font-semibold">{s.label} <ChemText text={s.text} /></p>
               <div className="mt-2 flex gap-2">
-                <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: true }))} className="rounded-lg bg-emerald-500 px-3 py-1 text-white">Đúng</button>
-                <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: false }))} className="rounded-lg bg-rose-500 px-3 py-1 text-white">Sai</button>
+                  <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: true }))} className="rounded-lg bg-emerald-500 px-3 py-1 text-white">Đúng</button>
+                  <button onClick={() => setAttackAnswers((v) => ({ ...v, [s.id]: false }))} className="rounded-lg bg-rose-500 px-3 py-1 text-white">Sai</button>
               </div>
               {attackAnswers[s.id] !== undefined && (
                 <p className="mt-1 text-xs text-slate-600">Đã chọn: {attackAnswers[s.id] ? "Đúng" : "Sai"}</p>
