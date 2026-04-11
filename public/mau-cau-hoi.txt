@@ -1,0 +1,103 @@
+# ========================================
+# MAU SOAN CAU HOI DUNG/SAI - HOA HOC
+# ========================================
+#
+# HUONG DAN SU DUNG:
+# 1. Soan cau hoi theo format ben duoi
+# 2. Luu file dang .txt (chon UTF-8)
+# 3. Tai len trang "Tao Cau Hoi" > tab "Tai file len"
+#
+# CACH GO CONG THUC HOA HOC:
+# - Chi so duoi: go binh thuong
+#   Vi du: H2SO4 hien thi thanh H₂SO₄
+#   Vi du: C6H12O6 hien thi thanh C₆H₁₂O₆
+#
+# - Chi so tren (ion, dien tich): dung ^{...}
+#   Vi du: Fe^{2+} hien thi thanh Fe²⁺
+#   Vi du: SO4^{2-} hien thi thanh SO₄²⁻
+#
+# - Mui ten phan ung: -> (→), <-> (⇌)
+# - Delta: (delta) → Δ
+# - Do: (deg)C → °C
+#
+# LUU Y:
+# - Dong bat dau bang # la ghi chu (se bo qua)
+# - De trong dong giua cac cau hoi cho de doc
+# - Dap an: [DUNG] hoac [SAI] (viet hoa)
+#
+# ========================================
+
+## CAU DON DUNG/SAI
+# Format: [DUNG] hoac [SAI] Menh de | Giai thich
+
+[DUNG] Glucose co cong thuc C6H12O6. | Glucose la monosaccharide thuoc nhom aldohexose.
+
+[SAI] Fructose la aldose. | Fructose la ketose (co nhom C=O o C2), khong phai aldose.
+
+[DUNG] Ethyl acetate (CH3COOC2H5) thuoc nhom ester. | Ethyl acetate la mot ester pho bien co mui thom.
+
+[SAI] Phan ung thuy phan ester trong moi truong base la thuan nghich. | Xa phong hoa trong moi truong NaOH/KOH la phan ung mot chieu.
+
+[DUNG] Amine la dan xuat cua NH3 khi thay H bang goc hydrocarbon. | Day la dinh nghia co ban cua amine.
+
+[SAI] Aniline (C6H5NH2) la amine beo. | Aniline la aromatic amine vi co vong benzen.
+
+[DUNG] Protein la polymer cua amino acid. | Cac amino acid lien ket voi nhau bang lien ket peptide tao protein.
+
+[SAI] Cellulose tan tot trong nuoc. | Cellulose khong tan trong nuoc va nhieu dung moi huu co.
+
+[DUNG] Sucrose la disaccharide khong co tinh khu. | Sucrose khong con nhom OH hemiacetal tu do.
+
+[SAI] Polyethylene duoc tao tu phan ung trung nguong. | Polyethylene duoc tao tu phan ung trung hop CH2=CH2.
+
+
+## CAU 4 Y DUNG/SAI
+# Format: Giua 2 dau ---
+# Dong 1: Cau hoi
+# Dong 2-5: a/b/c/d. [DUNG] hoac [SAI] Noi dung
+# Dong cuoi: Giai thich: ...
+
+---
+Cho cac nhan dinh sau ve ester va lipid:
+a. [DUNG] Ethyl acetate thuoc nhom ester.
+b. [SAI] Phan ung xa phong hoa la phan ung thuan nghich.
+c. [DUNG] Triglyceride la triester cua glycerol voi fatty acid.
+d. [SAI] Lipid chi gom triglyceride.
+Giai thich: Xa phong hoa la mot chieu. Lipid gom triglyceride, wax, phospholipid, steroid.
+---
+
+---
+Cho cac nhan dinh sau ve carbohydrate:
+a. [DUNG] Glucose la aldohexose.
+b. [SAI] Fructose la aldose.
+c. [SAI] Sucrose co tinh khu.
+d. [DUNG] Maltose co tinh khu.
+Giai thich: Fructose la ketose. Sucrose khong co nhom hemiacetal tu do nen khong co tinh khu.
+---
+
+---
+Cho cac nhan dinh sau ve amine va amino acid:
+a. [DUNG] Aniline la aromatic amine.
+b. [DUNG] Glycine la hop chat luong tinh.
+c. [DUNG] Lien ket peptide co dang -CO-NH-.
+d. [SAI] Protein khong duoc tao tu amino acid.
+Giai thich: Protein la polymer cua amino acid duoc lien ket boi lien ket peptide (-CO-NH-).
+---
+
+---
+Cho cac nhan dinh sau ve polymer:
+a. [DUNG] Polyethylene duoc tao tu monomer ethylene (CH2=CH2).
+b. [DUNG] PVC la poly(vinyl chloride).
+c. [SAI] Teflon la polyamide.
+d. [DUNG] Nylon-6,6 thuoc nhom polyamide.
+Giai thich: Teflon la polytetrafluoroethylene (PTFE), khong phai polyamide.
+---
+
+---
+Cho cac nhan dinh sau ve dien hoa:
+a. [DUNG] Trong pin galvanic, electron di tu anode sang cathode.
+b. [DUNG] An mon dien hoa cua iron lien quan pin vi mo.
+c. [SAI] Copper khong day duoc silver khoi dung dich AgNO3.
+d. [DUNG] Aluminum duoc dieu che bang dien phan nong chay Al2O3.
+Giai thich: Cu day duoc Ag vi Cu hoat dong manh hon Ag trong day dien hoa.
+---

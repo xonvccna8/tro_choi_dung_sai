@@ -31,6 +31,8 @@ type GameStore = {
   toggleSound: () => void;
   addCustomTrueFalseQuestion: (question: TrueFalseQuestion) => void;
   addCustomMultiTrueFalseQuestion: (question: MultiTrueFalseQuestion) => void;
+  removeCustomTrueFalseQuestion: (id: string) => void;
+  removeCustomMultiTrueFalseQuestion: (id: string) => void;
   addExamResult: (result: ExamResult) => void;
   addErrors: (errors: ErrorRecord[]) => void;
   removeError: (id: string) => void;
@@ -77,6 +79,14 @@ export const useGameStore = create<GameStore>()(
         set((state) => ({ customTrueFalseQuestions: [question, ...state.customTrueFalseQuestions] })),
       addCustomMultiTrueFalseQuestion: (question) =>
         set((state) => ({ customMultiTrueFalseQuestions: [question, ...state.customMultiTrueFalseQuestions] })),
+      removeCustomTrueFalseQuestion: (id) =>
+        set((state) => ({
+          customTrueFalseQuestions: state.customTrueFalseQuestions.filter((q) => q.id !== id),
+        })),
+      removeCustomMultiTrueFalseQuestion: (id) =>
+        set((state) => ({
+          customMultiTrueFalseQuestions: state.customMultiTrueFalseQuestions.filter((q) => q.id !== id),
+        })),
       addExamResult: (result) =>
         set((state) => ({ examHistory: [result, ...state.examHistory].slice(0, 50) })),
       addErrors: (errors) =>
