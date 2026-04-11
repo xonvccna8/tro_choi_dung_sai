@@ -15,6 +15,8 @@ import { BlindBoxPage } from "./pages/BlindBoxPage";
 import { ChemArenaPage } from "./pages/ChemArenaPage";
 import { QuestionBuilderPage } from "./pages/QuestionBuilderPage";
 import { StrategyGuidePage } from "./pages/StrategyGuidePage";
+import { TeacherDashboardPage } from "./pages/TeacherDashboardPage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { GamesHubPage } from "./pages/GamesHubPage";
 import { MainLayout } from "./components/MainLayout";
 import { useGameStore } from "./store/useGameStore";
@@ -32,6 +34,10 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         
+        {/* Role based dashboards */}
+        <Route path="/admin" element={<GuardedRoute><AdminDashboardPage /></GuardedRoute>} />
+        <Route path="/teacher" element={<GuardedRoute><TeacherDashboardPage /></GuardedRoute>} />
+
         {/* Layout routes with Tab Bar */}
         <Route element={<GuardedRoute><MainLayout /></GuardedRoute>}>
           <Route path="/dashboard" element={<DashboardPage />} />

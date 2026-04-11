@@ -6,6 +6,7 @@ type AppUser = {
   id: string;
   name: string;
   avatar: string;
+  role: "admin" | "teacher" | "student";
 };
 
 type GameStore = {
