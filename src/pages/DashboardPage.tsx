@@ -4,11 +4,17 @@ import { useGameStore } from "../store/useGameStore";
 
 const examModes = [
   {
+    to: "/game/arena",
+    title: "⚔️ Đấu Trường Hóa Học",
+    desc: "3 vòng – 10 câu – 10 điểm – Luyện như thi thật!",
+    color: "from-violet-500 via-fuchsia-500 to-pink-500",
+    big: true,
+  },
+  {
     to: "/game/exam",
     title: "📝 Thi Thử Thật",
     desc: "4 câu × 4 ý, timer 8 phút, điểm thật",
     color: "from-violet-400 to-fuchsia-500",
-    big: true,
   },
   {
     to: "/game/eliminate",

@@ -13,6 +13,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { PirateIslandPage } from "./pages/PirateIslandPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { BlindBoxPage } from "./pages/BlindBoxPage";
+import { ChemArenaPage } from "./pages/ChemArenaPage";
 import { QuestionBuilderPage } from "./pages/QuestionBuilderPage";
 import { StrategyGuidePage } from "./pages/StrategyGuidePage";
 import { useGameStore } from "./store/useGameStore";
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/game/run" element={<GuardedRoute><EndlessRunPage /></GuardedRoute>} />
         <Route path="/game/box" element={<GuardedRoute><BlindBoxPage /></GuardedRoute>} />
         <Route path="/game/exam" element={<GuardedRoute><ExamSimulatorPage /></GuardedRoute>} />
+        <Route path="/game/arena" element={<GuardedRoute><ChemArenaPage /></GuardedRoute>} />
         <Route path="/game/eliminate" element={<GuardedRoute><EliminationTrainerPage /></GuardedRoute>} />
         <Route path="/game/errors" element={<GuardedRoute><ErrorBookPage /></GuardedRoute>} />
         <Route path="/strategy" element={<GuardedRoute><StrategyGuidePage /></GuardedRoute>} />
