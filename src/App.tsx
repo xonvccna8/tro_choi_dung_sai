@@ -16,6 +16,8 @@ import { BlindBoxPage } from "./pages/BlindBoxPage";
 import { ChemArenaPage } from "./pages/ChemArenaPage";
 import { QuestionBuilderPage } from "./pages/QuestionBuilderPage";
 import { StrategyGuidePage } from "./pages/StrategyGuidePage";
+import { GamesHubPage } from "./pages/GamesHubPage";
+import { MainLayout } from "./components/MainLayout";
 import { useGameStore } from "./store/useGameStore";
 
 function GuardedRoute({ children }: { children: ReactElement }) {
@@ -26,18 +28,24 @@ function GuardedRoute({ children }: { children: ReactElement }) {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-500 via-fuchsia-500 to-sky-500">
+    <div className="min-h-screen bg-gradient-to-b from-violet-500 via-fuchsia-500 to-sky-500 text-slate-800">
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <GuardedRoute>
-              <DashboardPage />
-            </GuardedRoute>
-          }
-        />
+        
+        {/* Layout routes with Tab Bar */}
+        <Route element={<GuardedRoute><MainLayout /></GuardedRoute>}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/games" element={<GamesHubPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/collection" element={<CollectionPage />} />
+          <Route path="/daily" element={<DailyMissionPage />} />
+          <Route path="/builder" element={<QuestionBuilderPage />} />
+          <Route path="/strategy" element={<StrategyGuidePage />} />
+        </Route>
+
+        {/* Full screen game routes */}
         <Route path="/game/pirate" element={<GuardedRoute><PirateIslandPage /></GuardedRoute>} />
         <Route path="/game/run" element={<GuardedRoute><EndlessRunPage /></GuardedRoute>} />
         <Route path="/game/box" element={<GuardedRoute><BlindBoxPage /></GuardedRoute>} />
@@ -45,12 +53,7 @@ export default function App() {
         <Route path="/game/arena" element={<GuardedRoute><ChemArenaPage /></GuardedRoute>} />
         <Route path="/game/eliminate" element={<GuardedRoute><EliminationTrainerPage /></GuardedRoute>} />
         <Route path="/game/errors" element={<GuardedRoute><ErrorBookPage /></GuardedRoute>} />
-        <Route path="/strategy" element={<GuardedRoute><StrategyGuidePage /></GuardedRoute>} />
-        <Route path="/daily" element={<GuardedRoute><DailyMissionPage /></GuardedRoute>} />
-        <Route path="/leaderboard" element={<GuardedRoute><LeaderboardPage /></GuardedRoute>} />
-        <Route path="/profile" element={<GuardedRoute><ProfilePage /></GuardedRoute>} />
-        <Route path="/collection" element={<GuardedRoute><CollectionPage /></GuardedRoute>} />
-        <Route path="/builder" element={<GuardedRoute><QuestionBuilderPage /></GuardedRoute>} />
+        
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>

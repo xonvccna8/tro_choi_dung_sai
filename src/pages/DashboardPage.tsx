@@ -1,4 +1,4 @@
-import { Trophy, Flame, Coins } from "lucide-react";
+import { Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGameStore } from "../store/useGameStore";
 
@@ -34,12 +34,6 @@ const examModes = [
     desc: "6 phương pháp hiệu quả",
     color: "from-amber-400 to-orange-500",
   },
-];
-
-const miniGames = [
-  { to: "/game/pirate", title: "🏴‍☠️ Đảo Hải Tặc", color: "from-yellow-300 to-orange-300" },
-  { to: "/game/run", title: "🏃 Đường Chạy Vô Cực", color: "from-cyan-300 to-blue-300" },
-  { to: "/game/box", title: "🎁 Hộp Bí Ẩn", color: "from-pink-300 to-fuchsia-300" },
 ];
 
 export function DashboardPage() {
@@ -125,42 +119,21 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Mini games */}
-      <div className="mt-4">
-        <h2 className="mb-2 text-lg font-black text-white">🎮 Trò Chơi Nhỏ</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {miniGames.map((g) => (
-            <Link
-              key={g.to}
-              to={g.to}
-              className={`rounded-2xl bg-gradient-to-r p-3 text-center shadow-xl ${g.color}`}
-            >
-              <p className="text-sm font-black text-slate-900">{g.title}</p>
-            </Link>
-          ))}
-        </div>
-      </div>
-
       {/* Utilities */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <Link to="/daily" className="rounded-2xl bg-white/90 p-4">
-          <Flame className="mb-2" />
-          Nhiệm vụ hằng ngày
-        </Link>
-        <Link to="/leaderboard" className="rounded-2xl bg-white/90 p-4">
-          <Trophy className="mb-2" />
-          Bảng xếp hạng
-        </Link>
-        <Link to="/profile" className="rounded-2xl bg-white/90 p-4">
-          <Coins className="mb-2" />
-          Hồ sơ
-        </Link>
-        <Link to="/collection" className="rounded-2xl bg-white/90 p-4">
-          🎴 Bộ sưu tập
-        </Link>
-        <Link to="/builder" className="col-span-2 rounded-2xl bg-white/90 p-4 text-center">
-          🧪 Tạo câu hỏi
-        </Link>
+      <div className="mt-4">
+        <h2 className="mb-2 text-lg font-black text-white">⭐ Nhiệm Vụ & Công Cụ</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Link to="/daily" className="rounded-2xl bg-white/90 p-4">
+            <Flame className="mb-2" />
+            Nhiệm vụ hằng ngày
+          </Link>
+          <Link to="/collection" className="rounded-2xl bg-white/90 p-4">
+            🎴 Bộ sưu tập
+          </Link>
+          <Link to="/builder" className="col-span-2 rounded-2xl bg-white/90 p-4 text-center">
+            🧪 Tạo câu hỏi
+          </Link>
+        </div>
       </div>
     </main>
   );
