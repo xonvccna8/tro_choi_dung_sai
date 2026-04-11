@@ -1,3 +1,5 @@
+import mammoth from "mammoth";
+
 export type ParsedTrueFalse = {
   statement: string;
   correct: boolean;
@@ -117,4 +119,14 @@ export function parseQuestionFile(content: string): ParsedResult {
   }
 
   return result;
+}
+
+/**
+ * Parse a .docx (Word) file into question objects.
+ * Uses mammoth to extract raw text, then passes to the existing parser.
+ */
+export async function parseDocxFile(file: File): Promise<ParsedResult> {
+  const arrayBuffer = await file.arrayBuffer();
+  const { value: text } = await mammoth.extractRawText({ arrayBuffer });
+  return parseQuestionFile(text);
 }

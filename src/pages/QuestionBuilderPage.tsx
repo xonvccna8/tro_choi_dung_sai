@@ -4,8 +4,9 @@ import { ChemText } from "../components/ChemText";
 import { FormulaToolbar } from "../components/FormulaToolbar";
 import { GameShell } from "../components/GameShell";
 import { useGameStore } from "../store/useGameStore";
-import { parseQuestionFile } from "../utils/questionParser";
+import { parseQuestionFile, parseDocxFile } from "../utils/questionParser";
 import type { ParsedResult } from "../utils/questionParser";
+import { downloadWordTemplate } from "../utils/generateTemplate";
 
 type Tab = "manual" | "upload";
 
@@ -149,21 +150,26 @@ export function QuestionBuilderPage() {
   };
 
   /* ── File handling ── */
-  const processFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const content = ev.target?.result as string;
-      try {
-        const result = parseQuestionFile(content);
-        setParsedData(result);
-        setUploadMsg(
-          `✅ Tìm thấy: ${result.trueFalse.length} câu đơn + ${result.multiTrueFalse.length} câu 4 ý`,
-        );
-      } catch {
-        setUploadMsg("⚠️ Lỗi đọc file. Kiểm tra lại format.");
+  const processFile = async (file: File) => {
+    try {
+      let result: ParsedResult;
+
+      if (file.name.endsWith(".docx")) {
+        // Parse Word file using mammoth
+        result = await parseDocxFile(file);
+      } else {
+        // Fallback: parse as plain text (.txt, .csv)
+        const content = await file.text();
+        result = parseQuestionFile(content);
       }
-    };
-    reader.readAsText(file, "UTF-8");
+
+      setParsedData(result);
+      setUploadMsg(
+        `✅ Tìm thấy: ${result.trueFalse.length} câu đơn + ${result.multiTrueFalse.length} câu 4 ý`,
+      );
+    } catch {
+      setUploadMsg("⚠️ Lỗi đọc file. Kiểm tra lại format.");
+    }
   };
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
@@ -439,30 +445,29 @@ export function QuestionBuilderPage() {
         <div className="space-y-3">
           {/* Download template */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="text-lg font-black text-violet-700">📄 Bước 1: Tải mẫu file</h3>
+            <h3 className="text-lg font-black text-violet-700">📄 Bước 1: Tải mẫu file Word</h3>
             <p className="mt-1 text-sm text-slate-600">
-              Tải mẫu, mở bằng Word hoặc Notepad, soạn câu hỏi theo format, lưu thành .txt (UTF-8), rồi tải lên.
+              Tải mẫu file .docx, mở bằng Word, soạn câu hỏi theo format có sẵn, lưu lại rồi tải lên.
             </p>
-            <a
-              href="/mau-cau-hoi.txt"
-              download="mau-cau-hoi.txt"
-              className="mt-3 inline-block rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 py-3 font-bold text-white shadow-lg"
+            <button
+              onClick={() => downloadWordTemplate()}
+              className="mt-3 inline-block rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-5 py-3 font-bold text-white shadow-lg hover:brightness-110 transition cursor-pointer"
             >
-              ⬇️ Tải mẫu câu hỏi (.txt)
-            </a>
+              ⬇️ Tải mẫu câu hỏi (.docx)
+            </button>
           </div>
 
           {/* Format guide */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="font-black text-violet-700">📋 Hướng dẫn format</h3>
+            <h3 className="font-black text-violet-700">📋 Hướng dẫn format trong Word</h3>
             <div className="mt-2 space-y-2 text-sm">
               <div className="rounded-lg bg-violet-50 p-3">
                 <p className="font-bold text-violet-700">Câu đơn Đúng/Sai:</p>
                 <code className="mt-1 block rounded bg-white p-2 text-xs text-slate-700">
-                  [DUNG] H2SO4 la acid manh. | Vi H2SO4 phan li hoan toan.
+                  [ĐÚNG] H2SO4 là acid mạnh. | Vì H2SO4 phân li hoàn toàn.
                 </code>
                 <code className="mt-1 block rounded bg-white p-2 text-xs text-slate-700">
-                  [SAI] Fructose la aldose. | Fructose la ketose.
+                  [SAI] Fructose là aldose. | Fructose là ketose.
                 </code>
               </div>
 
@@ -470,28 +475,28 @@ export function QuestionBuilderPage() {
                 <p className="font-bold text-fuchsia-700">Câu 4 ý (giữa 2 dấu ---):</p>
                 <pre className="mt-1 whitespace-pre-wrap rounded bg-white p-2 text-xs text-slate-700">
 {`---
-Cho cac nhan dinh sau:
-a. [DUNG] Glucose la aldohexose.
-b. [SAI] Fructose la aldose.
-c. [SAI] Sucrose co tinh khu.
-d. [DUNG] Maltose co tinh khu.
-Giai thich: Fructose la ketose.
+Cho các nhận định sau:
+a. [ĐÚNG] Glucose là aldohexose.
+b. [SAI] Fructose là aldose.
+c. [SAI] Saccharose có tính khử.
+d. [ĐÚNG] Maltose có tính khử.
+Giải thích: Fructose là ketose.
 ---`}
                 </pre>
               </div>
 
               <div className="rounded-lg bg-amber-50 p-3">
-                <p className="font-bold text-amber-700">Công thức hóa học:</p>
-                <p>• Chỉ số dưới: gõ bình thường → H2SO4 hiển thị <ChemText text="H2SO4" /></p>
-                <p>• Chỉ số trên: dùng ^{"{…}"} → Fe^{"{…}"} hiển thị <ChemText text="Fe^{2+}" /></p>
-                <p>• Mũi tên: {"->"} hiển thị <ChemText text="->" /> | {"<->"} hiển thị <ChemText text="<->" /></p>
+                <p className="font-bold text-amber-700">Lưu ý quan trọng:</p>
+                <p>• Soạn trong Word bình thường, giữ nguyên format [ĐÚNG] / [SAI]</p>
+                <p>• Lưu file .docx (không cần chuyển sang .txt)</p>
+                <p>• Xem chi tiết hướng dẫn trong file mẫu</p>
               </div>
             </div>
           </div>
 
           {/* Upload area */}
           <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-            <h3 className="text-lg font-black text-violet-700">📁 Bước 2: Tải file lên</h3>
+            <h3 className="text-lg font-black text-violet-700">📁 Bước 2: Tải file Word lên</h3>
             <div
               className="mt-3 flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-violet-300 bg-violet-50 p-6 transition hover:bg-violet-100"
               onClick={() => fileInputRef.current?.click()}
@@ -501,13 +506,13 @@ Giai thich: Fructose la ketose.
               }}
               onDrop={handleDrop}
             >
-              <p className="text-4xl">📁</p>
-              <p className="mt-2 font-bold text-violet-700">Kéo thả file vào đây</p>
-              <p className="text-sm text-slate-500">hoặc bấm để chọn file (.txt)</p>
+              <p className="text-4xl">📄</p>
+              <p className="mt-2 font-bold text-violet-700">Kéo thả file Word vào đây</p>
+              <p className="text-sm text-slate-500">hoặc bấm để chọn file (.docx / .txt)</p>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".txt,.csv"
+                accept=".docx,.txt"
                 className="hidden"
                 onChange={handleFileSelect}
               />
