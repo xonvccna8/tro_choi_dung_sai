@@ -71,11 +71,12 @@ export async function downloadWordTemplate() {
 
           // ═══ HƯỚNG DẪN SỬ DỤNG ═══
           createSectionHeader("📌 HƯỚNG DẪN SỬ DỤNG"),
-          createBullet("Soạn câu hỏi theo đúng format bên dưới."),
+          createBullet("Soạn câu hỏi theo một trong 3 format bên dưới."),
           createBullet("Lưu file giữ nguyên định dạng .docx (Word)."),
-          createBullet("Tải file lên trang Tạo Câu Hỏi → hệ thống tự nhận dạng."),
-          createBullet("Mỗi dòng bắt đầu bằng [ĐÚNG] hoặc [SAI] sẽ được nhận dạng tự động."),
-          createBullet("Câu 4 ý phải nằm giữa 2 dòng gạch ngang: ---"),
+          createBullet("Tải file lên trang Tạo Câu Hỏi → hệ thống tự nhận dạng format."),
+          createBullet("[Format 1] Câu đơn: mỗi dòng [ĐÚNG] hoặc [SAI] + mệnh đề + | + giải thích."),
+          createBullet("[Format 2] Câu 4 ý cũ: mỗi câu nằm giữa 2 dòng gạch ngang ---"),
+          createBullet("[Format 3 MỚI] Câu 4 ý có ngữ cảnh: bắt đầu bằng 'Câu 1.' + phần 'Giải thích:' ở cuối."),
           emptyLine(),
 
           // ═══ BẢNG QUY ƯỚC FORMAT ═══
@@ -149,11 +150,24 @@ export async function downloadWordTemplate() {
           // PHẦN 2: CÂU 4 Ý ĐÚNG/SAI (GIỐNG ĐỀ THI)
           // ═══════════════════════════════════════════════
           createSectionHeader("═══ PHẦN 2: CÂU 4 Ý ĐÚNG/SAI (GIỐNG ĐỀ THI) ═══"),
-          createNote("Mỗi câu nằm giữa 2 dòng --- | Có đúng 4 ý a, b, c, d"),
-          createNote("Bạn có thể viết đoạn dẫn NHIỀU DÒNG trước các ý a, b, c, d. Hệ thống đã hỗ trợ dạng câu dài giống đề thi có bảng/số liệu."),
+          createNote("Format 2 (cũ): Mỗi câu nằm giữa 2 dòng --- | Có đúng 4 ý a, b, c, d"),
+          createNote("Format 3 (MỚI): Câu 1. Tiêu đề → ngữ cảnh → a/b/c/d → Giải thích: → Câu 2. ..."),
+          createNote("Nếu file dùng format 'Câu X.' thì HỆ THỐNG TỰ CHỌN format 3 (không cần ---)"),
           emptyLine(),
-
-          createChapterHeader("MẪU 4 Ý KIỂU ĐỀ THI DÀI (CÓ ĐOẠN DẪN + BẢNG SỐ LIỆU)"),
+          createChapterHeader("MẪU FORMAT 3 (MỚI – 'Câu X.' + ngữ cảnh)"),
+          ...createCauXFormat(
+            "1. Glucose trong dung dịch truyền",
+            ["Trong y học, dung dịch glucose 5% thường được dùng để bổ sung dịch và cung cấp năng lượng."],
+            [
+              { label: "a", correct: true, text: "Glucose là monosaccharide có công thức phân tử C6H12O6." },
+              { label: "b", correct: false, text: "Glucose và fructose là cùng một chất vì có cùng công thức phân tử." },
+              { label: "c", correct: false, text: "Trong nước, glucose tồn tại chủ yếu ở dạng mạch hở." },
+              { label: "d", correct: true, text: "Glucose có thể đi vào các con đường chuyển hóa để cung cấp năng lượng." },
+            ],
+            "a đúng vì glucose là monosaccharide 6 carbon. b sai vì glucose và fructose chỉ là đồng phân. c sai vì trong nước, glucose tồn tại chủ yếu ở dạng vòng. d đúng vì glucose là nguồn năng lượng trung tâm."
+          ),
+          emptyLine(),
+          createChapterHeader("MẪU FORMAT 2 CŨ (--- markers)"),
           ...createRichStemMultiQuestion(
             [
               "NAP 3: Thép là hợp kim của iron (Fe) và carbon, vốn dễ bị ăn mòn khi tiếp xúc với nước biển giàu oxygen và muối. Để bảo vệ thép, người ta thường dùng phương pháp điện hóa (gắn khối Mg làm vật hi sinh) hoặc sơn phủ bề mặt.",
@@ -449,6 +463,64 @@ function createRichStemMultiQuestion(
   paragraphs.push(
     new Paragraph({
       children: [new TextRun({ text: "---", bold: true, size: 24, color: "9E9E9E" })],
+    }),
+  );
+
+  return paragraphs;
+}
+
+function createCauXFormat(
+  cauTitle: string,
+  contextLines: string[],
+  statements: { label: string; correct: boolean; text: string }[],
+  explanation: string,
+): Paragraph[] {
+  const paragraphs: Paragraph[] = [];
+
+  // "Câu X. Title" line
+  paragraphs.push(
+    new Paragraph({
+      spacing: { before: 140, after: 40 },
+      children: [
+        new TextRun({ text: `Câu ${cauTitle}`, bold: true, size: 26, color: "1A237E" }),
+      ],
+    }),
+  );
+
+  // Context lines
+  for (const ctxLine of contextLines) {
+    paragraphs.push(
+      new Paragraph({
+        spacing: { after: 30 },
+        children: [new TextRun({ text: ctxLine, italics: true, size: 22, color: "424242" })],
+      }),
+    );
+  }
+
+  // a/b/c/d statements
+  for (const s of statements) {
+    const tag = s.correct ? "[ĐÚNG]" : "[SAI]";
+    const tagColor = s.correct ? "2E7D32" : "C62828";
+    paragraphs.push(
+      new Paragraph({
+        spacing: { after: 30 },
+        children: [
+          new TextRun({ text: `${s.label}. `, bold: true, size: 24, color: "4A148C" }),
+          new TextRun({ text: `${tag} `, bold: true, size: 24, color: tagColor }),
+          new TextRun({ text: s.text, size: 24 }),
+        ],
+      }),
+    );
+  }
+
+  // Explanation
+  paragraphs.push(
+    new Paragraph({
+      spacing: { after: 60 },
+      children: [
+        new TextRun({ text: "Giải thích: ", bold: true, size: 22, color: "E65100" }),
+        new TextRun({ text: explanation, italics: true, size: 22, color: "616161" }),
+      ],
     }),
   );
 

@@ -18,25 +18,6 @@ export type ParsedResult = {
 };
 
 /**
- * Parse a structured text file into question objects.
- *
- * Supported formats:
- *
- * Single true/false:
- *   [DUNG] Menh de o day. | Giai thich o day.
- *   [SAI]  Menh de o day. | Giai thich o day.
- *
- * Multi true/false (between --- markers):
- *   ---
- *   Cau hoi o dong dau tien
- *   a. [DUNG] Noi dung y a.
- *   b. [SAI]  Noi dung y b.
- *   c. [DUNG] Noi dung y c.
- *   d. [SAI]  Noi dung y d.
- *   Giai thich: Noi dung giai thich.
- *   ---
- */
-/**
  * Normalize text extracted by mammoth - fix common encoding issues with Vietnamese
  * Also normalize [ĐÚNG]/[DUNG] variants to a canonical form
  */
@@ -57,22 +38,109 @@ function normalizeText(text: string): string {
     .replace(/\[sai\]/gi, "[SAI]");
 }
 
+/** Match a statement line: a. [ĐÚNG] ... or a. [SAI] ... */
+const STMT_REGEX = /^([a-d])\s*[.)]\s*\[(ĐÚNG|SAI)\]\s*(.+)/i;
+
+/** Match an explanation line */
+const EXP_REGEX = /^(Giai thich|Giải thích|GIAI THICH|GT)\s*[:.]?\s*(.+)/i;
+
+/** Match a "Câu X." header line (format 2) */
+const CAU_REGEX = /^Câu\s+\d+[.:)]/i;
+
+/**
+ * Try to build a multi-true-false question from a block of lines.
+ * Returns the question or null if not enough data.
+ */
+function buildMultiQuestion(block: string[]): ParsedMultiTrueFalse | null {
+  const stemLines: string[] = [];
+  const statements: { label: string; text: string; correct: boolean }[] = [];
+  let explanation = "";
+
+  for (const line of block) {
+    const stmtMatch = line.match(STMT_REGEX);
+    if (stmtMatch) {
+      const correctVal = stmtMatch[2].toUpperCase();
+      statements.push({
+        label: stmtMatch[1] + ".",
+        text: stmtMatch[3].trim(),
+        correct: correctVal === "ĐÚNG",
+      });
+      continue;
+    }
+
+    const expMatch = line.match(EXP_REGEX);
+    if (expMatch) {
+      explanation = expMatch[2].trim();
+      continue;
+    }
+
+    // If we haven't seen any statements yet, it's part of the stem
+    if (statements.length === 0 && line.trim()) {
+      stemLines.push(line.trim());
+    }
+  }
+
+  if (statements.length === 4) {
+    return {
+      question: stemLines.join("\n"),
+      statements,
+      explanation: explanation || "Giáo viên chưa thêm giải thích.",
+    };
+  }
+  return null;
+}
+
+/**
+ * Parse a structured text file into question objects.
+ *
+ * Supported formats:
+ *
+ * FORMAT 1 – Single true/false (one per line):
+ *   [ĐÚNG] Mệnh đề ở đây. | Giải thích ở đây.
+ *   [SAI]  Mệnh đề ở đây. | Giải thích ở đây.
+ *
+ * FORMAT 2 – Multi true/false (--- markers):
+ *   ---
+ *   Câu hỏi ở dòng đầu tiên
+ *   a. [ĐÚNG] Nội dung ý a.
+ *   ...
+ *   Giải thích: Nội dung giải thích.
+ *   ---
+ *
+ * FORMAT 3 – Multi true/false (Câu X. header, rich context):
+ *   Câu 1. Tên câu hỏi
+ *   [Các dòng ngữ cảnh tùy ý]
+ *   a. [ĐÚNG] Nội dung ý a.
+ *   b. [SAI]  Nội dung ý b.
+ *   c. [SAI]  Nội dung ý c.
+ *   d. [ĐÚNG] Nội dung ý d.
+ *   Giải thích: Nội dung giải thích.
+ *   [Câu tiếp theo hoặc cuối file]
+ */
 export function parseQuestionFile(rawContent: string): ParsedResult {
   const content = normalizeText(rawContent);
   const lines = content.split("\n").map((l) => l.trim());
   const result: ParsedResult = { trueFalse: [], multiTrueFalse: [] };
 
+  // ── PRE-PASS: detect Format 3 ("Câu X." header) ──
+  // If file contains "Câu X." lines, parse using the rich-context format
+  const hasCauFormat = lines.some((l) => CAU_REGEX.test(l));
+  if (hasCauFormat) {
+    return parseCauFormat(lines, result);
+  }
+
+  // ── NORMAL PASS: Format 1 + Format 2 ──
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
 
-    // Skip comments, section headers, empty lines
+    // Skip empty or comment lines
     if (!line || line.startsWith("#") || line.startsWith("//")) {
       i++;
       continue;
     }
 
-    // ── Multi true-false block (between --- markers) ──
+    // ── Format 2: Multi true-false block (between --- markers) ──
     if (line === "---") {
       i++;
       const block: string[] = [];
@@ -83,68 +151,135 @@ export function parseQuestionFile(rawContent: string): ParsedResult {
       i++; // skip closing ---
 
       if (block.length >= 5) {
-        const stemLines: string[] = [block[0]];
-        const statements: { label: string; text: string; correct: boolean }[] = [];
-        let explanation = "";
-
-        for (const bline of block.slice(1)) {
-          // Match: a. [DUNG] text  or  a. [SAI] text  (case insensitive, Vietnamese accents)
-          // After normalizeText, only [ĐÚNG] and [SAI] remain
-          const stmtMatch = bline.match(
-            /^([a-d])\s*\.\s*\[(ĐÚNG|SAI)\]\s*(.+)/i,
-          );
-          if (stmtMatch) {
-            const correctVal = stmtMatch[2].toUpperCase();
-            statements.push({
-              label: stmtMatch[1] + ".",
-              text: stmtMatch[3].trim(),
-              correct: correctVal === "ĐÚNG",
-            });
-            continue;
-          }
-
-          // Match explanation line
-          const expMatch = bline.match(/^(Giai thich|Giải thích|GIAI THICH|GT):\s*(.+)/i);
-          if (expMatch) {
-            explanation = expMatch[2].trim();
-            continue;
-          }
-
-          if (statements.length === 0 && bline.trim()) {
-            stemLines.push(bline.trim());
-          }
-        }
-
-        if (statements.length === 4) {
-          result.multiTrueFalse.push({
-            question: stemLines.join("\n"),
-            statements,
-            explanation: explanation || "Giao vien chua them giai thich.",
-          });
-        }
+        const q = buildMultiQuestion(block);
+        if (q) result.multiTrueFalse.push(q);
       }
       continue;
     }
 
-    // ── Single true-false: [DUNG] or [SAI] statement | explanation ──
-    // After normalizeText, only [ĐÚNG] and [SAI] remain
-    const tfMatch = line.match(
-      /^\[(ĐÚNG|SAI)\]\s*(.+)/i,
-    );
+    // ── Format 1: Single true-false: [ĐÚNG/SAI] statement | explanation ──
+    const tfMatch = line.match(/^\[(ĐÚNG|SAI)\]\s*(.+)/i);
     if (tfMatch) {
-      const correctVal = tfMatch[1].toUpperCase();
-      const correct = correctVal === "ĐÚNG";
+      const correct = tfMatch[1].toUpperCase() === "ĐÚNG";
       const rest = tfMatch[2];
       const pipeIdx = rest.indexOf("|");
       const statement = pipeIdx >= 0 ? rest.substring(0, pipeIdx).trim() : rest.trim();
       const explanation =
-        pipeIdx >= 0 ? rest.substring(pipeIdx + 1).trim() : "Giao vien chua them giai thich.";
+        pipeIdx >= 0 ? rest.substring(pipeIdx + 1).trim() : "Giáo viên chưa thêm giải thích.";
       result.trueFalse.push({ statement, correct, explanation });
       i++;
       continue;
     }
 
     i++;
+  }
+
+  return result;
+}
+
+/**
+ * Parse Format 3 – rich-context format with "Câu X." headers.
+ * Each question block starts with "Câu X." and ends when the next one starts or file ends.
+ */
+function parseCauFormat(lines: string[], result: ParsedResult): ParsedResult {
+  // Group lines into question blocks
+  const blocks: string[][] = [];
+  let current: string[] | null = null;
+
+  for (const line of lines) {
+    if (CAU_REGEX.test(line)) {
+      // Start a new block
+      if (current && current.length > 0) blocks.push(current);
+      current = [line];
+    } else if (current !== null) {
+      if (line) current.push(line);
+    } else {
+      // Lines before the first "Câu X." – check for Format 1 single questions
+      if (/^\[(ĐÚNG|SAI)\]/i.test(line)) {
+        const tfMatch = line.match(/^\[(ĐÚNG|SAI)\]\s*(.+)/i);
+        if (tfMatch) {
+          const correct = tfMatch[1].toUpperCase() === "ĐÚNG";
+          const rest = tfMatch[2];
+          const pipeIdx = rest.indexOf("|");
+          const statement = pipeIdx >= 0 ? rest.substring(0, pipeIdx).trim() : rest.trim();
+          const explanation =
+            pipeIdx >= 0 ? rest.substring(pipeIdx + 1).trim() : "Giáo viên chưa thêm giải thích.";
+          result.trueFalse.push({ statement, correct, explanation });
+        }
+      }
+    }
+  }
+  if (current && current.length > 0) blocks.push(current);
+
+  // Parse each block
+  for (const block of blocks) {
+    // The first line is "Câu X. – Title", rest is context + a/b/c/d + giải thích
+    // We skip the "Câu X." header line and collect the rest
+    const bodyLines = block.slice(1).filter(Boolean);
+
+    // Check if this block contains a/b/c/d statements
+    const hasStatements = bodyLines.some((l) => STMT_REGEX.test(l));
+
+    if (hasStatements) {
+      // Multi true-false: collect stem (everything before first stmt line)
+      const stemLines: string[] = [];
+      const statements: { label: string; text: string; correct: boolean }[] = [];
+      let explanation = "";
+      let seenFirstStmt = false;
+
+      for (const line of bodyLines) {
+        const stmtMatch = line.match(STMT_REGEX);
+        if (stmtMatch) {
+          seenFirstStmt = true;
+          const correctVal = stmtMatch[2].toUpperCase();
+          statements.push({
+            label: stmtMatch[1] + ".",
+            text: stmtMatch[3].trim(),
+            correct: correctVal === "ĐÚNG",
+          });
+          continue;
+        }
+
+        const expMatch = line.match(EXP_REGEX);
+        if (expMatch) {
+          explanation = expMatch[2].trim();
+          continue;
+        }
+
+        if (!seenFirstStmt) {
+          stemLines.push(line.trim());
+        }
+      }
+
+      // Build stem: title line is block[0] without "Câu X." prefix
+      const titleLine = block[0].replace(CAU_REGEX, "").trim();
+      const stem = [
+        ...(titleLine ? [titleLine] : []),
+        ...stemLines,
+      ].join("\n").trim();
+
+      if (statements.length === 4) {
+        result.multiTrueFalse.push({
+          question: stem || "Câu hỏi",
+          statements,
+          explanation: explanation || "Giáo viên chưa thêm giải thích.",
+        });
+      }
+    } else {
+      // No a/b/c/d → treat as single true-false if any [ĐÚNG/SAI] line
+      for (const line of bodyLines) {
+        const tfMatch = line.match(/^\[(ĐÚNG|SAI)\]\s*(.+)/i);
+        if (tfMatch) {
+          const correct = tfMatch[1].toUpperCase() === "ĐÚNG";
+          const rest = tfMatch[2];
+          const pipeIdx = rest.indexOf("|");
+          const statement = pipeIdx >= 0 ? rest.substring(0, pipeIdx).trim() : rest.trim();
+          const explanation =
+            pipeIdx >= 0 ? rest.substring(pipeIdx + 1).trim() : "Giáo viên chưa thêm giải thích.";
+          result.trueFalse.push({ statement, correct, explanation });
+        }
+      }
+    }
   }
 
   return result;
