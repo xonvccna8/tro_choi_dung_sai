@@ -44,7 +44,36 @@ function mapDoc(docSnap) {
   return { id: docSnap.id, assignmentId: typeof data.assignmentId === "string" ? data.assignmentId : "", assignmentTitle: typeof data.assignmentTitle === "string" ? data.assignmentTitle : "", mode: typeof data.mode === "string" ? data.mode : "run", score: typeof data.score === "number" ? data.score : 0, totalQuestions: typeof data.totalQuestions === "number" ? data.totalQuestions : 0, answers: data.answers && typeof data.answers === "object" ? data.answers : {}, createdAt: toIso(data.createdAt), createdByUid: typeof data.createdByUid === "string" ? data.createdByUid : null, createdByName: typeof data.createdByName === "string" ? data.createdByName : null, createdByRole: typeof data.createdByRole === "string" && validRoles.has(data.createdByRole) ? data.createdByRole : null };
 }
 
-async function list(req, res) { const db = getAdminDb(); const assignmentId = typeof req.query.assignmentId === "string" ? req.query.assignmentId.trim() : ""; let q = db.collection(COLLECTION); if (assignmentId) q = q.where("assignmentId", "==", assignmentId); const snap = await q.get(); sendJson(res, 200, { ok: true, results: snap.docs.map(mapDoc).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? "")) }); }
+async function list(req, res) { 
+  const assignmentId = typeof req.query.assignmentId === "string" ? req.query.assignmentId.trim() : ""; 
+  const teacherId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : ""; 
+
+  if ((teacherId && teacherId.startsWith("demo-")) || (assignmentId && assignmentId.startsWith("assign-"))) {
+    try {
+      const fs = require("fs");
+      const path = require("path");
+      const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
+      if (fs.existsSync(mockDataPath)) {
+        const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
+        const dbData = JSON.parse(dbRaw);
+        
+        // Filter mock results by assignmentId if provided
+        let results = dbData.gameResults || [];
+        if (assignmentId) {
+          results = results.filter(r => r.assignmentId === assignmentId);
+        }
+        
+        return sendJson(res, 200, { ok: true, results });
+      }
+    } catch(e) {}
+  }
+
+  const db = getAdminDb(); 
+  let q = db.collection(COLLECTION); 
+  if (assignmentId) q = q.where("assignmentId", "==", assignmentId); 
+  const snap = await q.get(); 
+  sendJson(res, 200, { ok: true, results: snap.docs.map(mapDoc).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? "")) }); 
+}
 async function create(req, res) { const db = getAdminDb(); const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {}; const actor = normalizeUser(body.user); const input = normalizeInput(body.result); const ref = db.collection(COLLECTION).doc(); const timestamp = FieldValue.serverTimestamp(); await ref.set({ ...input, createdAt: timestamp, createdByUid: actor?.id ?? null, createdByName: actor?.name ?? null, createdByRole: actor?.role ?? null }); sendJson(res, 200, { ok: true, id: ref.id }); }
 
 export default async function handler(req, res) { 

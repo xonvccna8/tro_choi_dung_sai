@@ -185,10 +185,27 @@ function mapQuestion(documentSnapshot) {
 }
 
 async function listQuestions(req, res) {
+  const teacherId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : "";
+
+  if (teacherId && teacherId.startsWith("demo-")) {
+    try {
+      const fs = require("fs");
+      const path = require("path");
+      const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
+      if (fs.existsSync(mockDataPath)) {
+        const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
+        const dbData = JSON.parse(dbRaw);
+        sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
+        return;
+      }
+    } catch (e) {
+      console.error("Lỗi đọc Mock DB trong listQuestions:", e);
+    }
+  }
+
   const db = getAdminDb();
   let query = db.collection(QUESTIONS_COLLECTION);
   
-  const teacherId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : "";
   if (teacherId) {
     query = query.where("createdByUid", "==", teacherId);
   }

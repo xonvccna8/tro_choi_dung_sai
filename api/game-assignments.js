@@ -44,7 +44,28 @@ function mapDoc(docSnap) {
 }
 
 async function getById(req, res) { const db = getAdminDb(); const id = typeof req.query.id === "string" ? req.query.id.trim() : ""; if (!id) return sendJson(res, 400, { ok: false, error: "Thiếu id." }); const snap = await db.collection(COLLECTION).doc(id).get(); if (!snap.exists) return sendJson(res, 404, { ok: false, error: "Không tìm thấy." }); sendJson(res, 200, { ok: true, assignment: mapDoc(snap) }); }
-async function list(req, res) { const db = getAdminDb(); const teacherId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : ""; let q = db.collection(COLLECTION); if (teacherId) q = q.where("createdByUid", "==", teacherId); const snap = await q.get(); sendJson(res, 200, { ok: true, assignments: snap.docs.map(mapDoc).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? "")) }); }
+async function list(req, res) { 
+  const teacherId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : ""; 
+
+  if (teacherId && teacherId.startsWith("demo-")) {
+    try {
+      const fs = require("fs");
+      const path = require("path");
+      const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
+      if (fs.existsSync(mockDataPath)) {
+        const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
+        const dbData = JSON.parse(dbRaw);
+        return sendJson(res, 200, { ok: true, assignments: dbData.gameAssignments || [] });
+      }
+    } catch(e) {}
+  }
+
+  const db = getAdminDb(); 
+  let q = db.collection(COLLECTION); 
+  if (teacherId) q = q.where("createdByUid", "==", teacherId); 
+  const snap = await q.get(); 
+  sendJson(res, 200, { ok: true, assignments: snap.docs.map(mapDoc).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? "")) }); 
+}
 async function create(req, res) { const db = getAdminDb(); const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {}; const actor = normalizeUser(body.user); const input = normalizeInput(body.assignment); const ref = db.collection(COLLECTION).doc(); const timestamp = FieldValue.serverTimestamp(); await ref.set({ ...input, createdAt: timestamp, updatedAt: timestamp, createdByUid: actor?.id ?? null, createdByName: actor?.name ?? null, createdByRole: actor?.role ?? null }); sendJson(res, 200, { ok: true, id: ref.id }); }
 async function update(req, res) { const db = getAdminDb(); const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {}; const id = typeof body.id === "string" ? body.id.trim() : ""; if (!id) throw new Error("Thiếu id giao trò chơi."); const input = normalizeInput(body.assignment); const ref = db.collection(COLLECTION).doc(id); const snap = await ref.get(); if (!snap.exists) return sendJson(res, 404, { ok: false, error: "Không tìm thấy." }); await ref.update({ ...input, updatedAt: FieldValue.serverTimestamp() }); sendJson(res, 200, { ok: true, id }); }
 async function remove(req, res) { const db = getAdminDb(); const id = typeof req.query.id === "string" ? req.query.id.trim() : ""; if (!id) return sendJson(res, 400, { ok: false, error: "Thiếu id." }); const ref = db.collection(COLLECTION).doc(id); const snap = await ref.get(); if (!snap.exists) return sendJson(res, 404, { ok: false, error: "Không tìm thấy." }); await ref.delete(); sendJson(res, 200, { ok: true, id }); }
