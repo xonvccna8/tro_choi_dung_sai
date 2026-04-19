@@ -170,6 +170,13 @@ export function LoginPage() {
     setError("");
     setSubmitting(true);
 
+    // Ưu tiên tài khoản Trải nghiệm cứng (Mock Accounts) kể cả khi hệ thống có Firebase
+    const emailKey = email.trim().toLowerCase();
+    if (isLogin && MOCK_ACCOUNTS[emailKey]) {
+      handleDemoSubmit();
+      return;
+    }
+
     try {
       if (!hasFirebaseConfig || !isConfigured) {
         handleDemoSubmit();
