@@ -1,7 +1,6 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
-import fs from "fs";
-import path from "path";
+import { mockData } from "./mock_db.js";
 
 const QUESTIONS_COLLECTION = "questions";
 const validRoles = new Set(["admin", "teacher", "student"]);
@@ -189,7 +188,7 @@ async function listQuestions(req, res) {
 
   if (teacherId && teacherId.startsWith("demo-")) {
     try {
-      const dbData = require("./mock_db.json");
+      const dbData = mockData;
       sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
       return;
     } catch (e) {

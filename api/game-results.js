@@ -1,7 +1,6 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
-import fs from "fs";
-import path from "path";
+import { mockData } from "./mock_db.js";
 
 const COLLECTION = "gameResults";
 const validRoles = new Set(["admin", "teacher", "student"]);
