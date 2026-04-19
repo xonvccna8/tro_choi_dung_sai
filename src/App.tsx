@@ -73,11 +73,22 @@ export default function App() {
           <Route path="/games/indirect" element={<IndirectGamesPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/exams" element={<StudentExamsPage />} />
+          <Route path="/exams/:examId" element={<StudentExamPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/daily" element={<DailyMissionPage />} />
           <Route path="/builder" element={<GuardedRoute allowedRoles={["teacher"]}><QuestionBuilderPage /></GuardedRoute>} />
           <Route path="/strategy" element={<StrategyGuidePage />} />
+
+          {/* Tất cả các trò chơi học sinh - đặt trong MainLayout để có TabBar */}
+          <Route path="/game/box" element={<BlindBoxPage />} />
+          <Route path="/game/pirate" element={<PirateIslandPage />} />
+          <Route path="/game/run" element={<EndlessRunPage />} />
+          <Route path="/game/eliminate" element={<EliminationTrainerPage />} />
+          <Route path="/game/errors" element={<ErrorBookPage />} />
+          <Route path="/game/arena" element={<AcademicArenaPage />} />
+          <Route path="/game/battle" element={<LiveBattleHubPage />} />
+          <Route path="/game/battle/:roomId" element={<LiveBattleRoomPage />} />
         </Route>
 
         <Route path="/game-assignment/:assignmentId" element={<GuardedRoute><StudentGamePage /></GuardedRoute>} />
