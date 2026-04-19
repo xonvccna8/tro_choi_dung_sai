@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Gamepad2, Layers3, Send, Sparkles, Users, Target, ShieldCheck, Bomb, FlaskConical, Swords, Check, Save } from "lucide-react";
-import { useQuestionBank, type SyncedQuestion } from "../hooks/useQuestionBank";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import type { SyncedQuestion } from "../types";
 import { listTeacherClasses, type TeacherClass } from "../lib/classroom";
 import { useAppAuth } from "../lib/AuthContext";
 import { fetchGameAssignmentById, saveGameAssignment, updateGameAssignment, type GameAssignmentMode, type GameAssignmentAudience } from "../lib/gameAssignments";
 import { useGameStore } from "../store/useGameStore";
 
-const modeCards: Array<{ mode: GameAssignmentMode; title: string; description: string; icon: JSX.Element; color: string }> = [
+const modeCards: Array<{ mode: GameAssignmentMode; title: string; description: string; icon: React.ReactNode; color: string }> = [
   { mode: "run", title: "Đường Chạy", description: "Tăng tốc phản xạ, phù hợp câu nhanh.", icon: <Target className="h-5 w-5" />, color: "from-emerald-500 to-teal-500" },
   { mode: "pirate", title: "Đảo Hải Tặc", description: "Vượt thử thách, câu hỏi mang tính khám phá.", icon: <Swords className="h-5 w-5" />, color: "from-amber-500 to-orange-500" },
   { mode: "blind-box", title: "Hộp Bí Ẩn", description: "Mở hộp theo lượt, tạo cảm giác bất ngờ.", icon: <ShieldCheck className="h-5 w-5" />, color: "from-sky-500 to-blue-500" },
@@ -51,7 +52,7 @@ export function TeacherGameAssignmentPage() {
     if (!id || loaded) return;
     let mounted = true;
     async function loadAssignment() {
-      const assignment = await fetchGameAssignmentById(id);
+      const assignment = await fetchGameAssignmentById(id as string);
       if (!mounted || !assignment) return;
       setEditingId(assignment.id);
       setTitle(assignment.title);

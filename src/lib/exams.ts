@@ -36,6 +36,7 @@ type ExamAttemptPayload = {
   score: number;
   totalQuestions: number;
   answers: Record<string, boolean>;
+  submittedAt?: string;
 };
 
 const EXAMS_ENDPOINT = "/api/exams";

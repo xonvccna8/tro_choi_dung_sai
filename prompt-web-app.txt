@@ -1,0 +1,5 @@
+Tạo một web app học tập bằng React + TypeScript + Firebase, giao diện đẹp, hiện đại, responsive.
+Xây dựng hệ thống thư viện câu hỏi theo cấu trúc: Lớp → Môn → Chương → Bài → Câu hỏi.
+Giáo viên có thể tạo, sửa, xóa câu hỏi; lọc theo lớp/môn/chương/bài; chọn câu hỏi và chuyển vào trò chơi; giao bài theo các mode: run, pirate, blind-box, elimination, arena; quản lý bài giao: xem, sửa, xóa, phát hành, thu hồi.
+Học sinh có thể xem danh sách game được giao, chỉ thấy game đã phát hành, mở game và chơi trực tiếp trong app, nộp bài và lưu kết quả.
+Dữ liệu lưu trên Firebase/Firestore, có thống kê kết quả theo lớp, học sinh, mode game. UI đẹp, dễ dùng cho giáo viên và học sinh. Luồng rõ ràng: thư viện câu hỏi → giao game → học sinh chơi → thống kê.

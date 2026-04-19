@@ -7,6 +7,8 @@ import {
   Layers3,
   ShieldCheck,
   Sparkles,
+  BarChart3,
+  ClipboardList,
   Target,
   Trophy,
   Users,

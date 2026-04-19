@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { BookOpen, Filter, Layers3, Send, Sparkles } from "lucide-react";
-import { useQuestionBank, type SyncedQuestion } from "../hooks/useQuestionBank";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import type { SyncedQuestion } from "../types";
 import { filterQuestionsByLibrary, isMultiTrueFalseQuestion, isTrueFalseQuestion } from "../lib/questionBank";
 import { useGameStore } from "../store/useGameStore";
 import { saveGameAssignment } from "../lib/gameAssignments";

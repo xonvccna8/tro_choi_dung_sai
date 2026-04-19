@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookMarked, Check, ClipboardList, Download, Filter, GripVertical, Plus, Search, Sparkles, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuestionBank, type SyncedQuestion } from "../hooks/useQuestionBank";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import type { SyncedQuestion } from "../types";
 import { useAppAuth } from "../lib/AuthContext";
 import { saveExam, type ExamAudience } from "../lib/exams";
 import { listTeacherClasses, type TeacherClass } from "../lib/classroom";
@@ -95,7 +96,7 @@ export function TeacherExamsPage() {
         if (isTrueFalseQuestion(question)) {
           return `${index + 1}. [${question.correct ? "ĐÚNG" : "SAI"}] ${question.statement}`;
         }
-        const options = question.statements.map((statement) => `${statement.label} ${statement.text}`).join("\n");
+        const options = question.statements.map((statement: any) => `${statement.label} ${statement.text}`).join("\n");
         return `${index + 1}. ${question.question}\n${options}`;
       }),
     ].filter(Boolean);
