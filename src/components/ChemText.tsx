@@ -14,38 +14,33 @@ function toSuperscript(text: string): string {
 }
 
 /**
- * Render một token hóa học với subscript cho chữ số VÀ biến theo sau chữ cái.
- * Ví dụ:
- *  H2SO4       → H₂SO₄
- *  CnH2nO2     → Cₙ H₂ₙ O₂
- *  C6H12O6     → C₆H₁₂O₆
- *  HCOOC2H5    → HCOOC₂H₅
+ * Render một token hóa học với subscript cho chữ số.
+ * CHỈ subscript:
+ *  - Chữ số thuần: H2SO4 → H₂SO₄
+ *  - Chữ số theo sau bởi biến n/m: H2nO2 → H₂ₙO₂
+ * KHÔNG subscript n/m ở cuối từ thông thường (carbon, tan, nhóm...)
  */
 function renderChemToken(token: string) {
-  // Phải có ít nhất 1 chữ cái + (chữ số hoặc n/m/x) để render subscript
-  if (!/[A-Za-z]/.test(token)) return <>{token}</>;
+  // Phải có ít nhất 1 chữ cái VÀ 1 chữ số mới cần xử lý
+  if (!/[A-Za-z]/.test(token) || !/\d/.test(token)) return <>{token}</>;
 
-  // Tách theo pattern: phần chữ hoặc phần số/biến
-  // Pattern: một loạt chữ cái (không phải n/m sau chữ số) HOẶC một loạt chữ số+biến
-  // Dùng regex để split thành các phần: text | digits | variable-subscript
-  // e.g. CnH2nO2 → ['C','n','H','2n','O','2']
-  const parts = token.split(/(\d+[nm]?|[nm]+(?=\d|[A-Z]|$))/g).filter(Boolean);
+  // Tách theo pattern: digit(s) optionally followed by n or m
+  // n/m chỉ là biến subscript khi đi SAU chữ số: "2n", "2m", "12n"
+  // KHÔNG subscript n/m đứng độc lập cuối từ thông thường
+  const parts = token.split(/(\d+[nm]?)/g).filter((p) => p !== "");
 
-  if (parts.length <= 1 && !/\d/.test(token) && !/[nm]/.test(token)) return <>{token}</>;
-
-  // Kiểm tra xem có phần subscriptable không
-  const hasSubscriptable = parts.some(p => /^\d+[nm]?$/.test(p) || /^[nm]+$/.test(p));
-  if (!hasSubscriptable) return <>{token}</>;
+  // Nếu không split được gì thêm → trả lại nguyên
+  if (parts.length <= 1) return <>{token}</>;
 
   return (
     <>
-      {parts.map((part, idx) => {
-        // Chữ số thuần hoặc chữ số + n/m → subscript
-        if (/^\d+[nm]?$/.test(part) || /^[nm]\d*$/.test(part)) {
-          return <sub key={idx}>{part}</sub>;
-        }
-        return <Fragment key={idx}>{part}</Fragment>;
-      })}
+      {parts.map((part, idx) =>
+        /^\d+[nm]?$/.test(part) ? (
+          <sub key={idx}>{part}</sub>
+        ) : (
+          <Fragment key={idx}>{part}</Fragment>
+        ),
+      )}
     </>
   );
 }
