@@ -1,4 +1,4 @@
-﻿import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { ChemText } from "../components/ChemText";
 import { FormulaToolbar } from "../components/FormulaToolbar";
@@ -382,6 +382,95 @@ export function QuestionBuilderPage() {
       setSaving(false);
     }
   };
+
+  /**
+   * Tự động phân bổ câu hỏi vào các game KHÁC NHAU:
+   * - Câu đơn: xoay kẽ run / pirate (mỗi câu chỉ 1 game)
+   * - Câu 4 ý: chia nhóm blind-box / elimination / arena-1 / arena-2 / arena-3
+   */
+  const importAutoDistribute = async () => {
+    if (!parsedData) return;
+    const totalSingle = parsedData.trueFalse.length;
+    const totalMulti = parsedData.multiTrueFalse.length;
+
+    if (totalSingle + totalMulti === 0) {
+      setFeedback({ tone: "error", text: "Không có câu hỏi nào để nhập." });
+      return;
+    }
+
+    const labels = ["a.", "b.", "c.", "d."] as const;
+    const payloads: CreateQuestionInput[] = [];
+
+    // === Câu đơn: xoay kẽ run → pirate → run → pirate ...
+    const singleModes: Array<"run" | "pirate"> = ["run", "pirate"];
+    parsedData.trueFalse.forEach((question, index) => {
+      const mode = singleModes[index % 2];
+      payloads.push({
+        type: "true-false",
+        statement: question.statement,
+        correct: question.correct,
+        explanation: question.explanation,
+        gameModes: [mode],
+        arenaRound: null,
+      });
+    });
+
+    // === Câu 4 ý: chia đều blind-box → elimination → arena(R1) → arena(R2) → arena(R3) → blind-box...
+    const multiModes: Array<{ mode: "blind-box" | "elimination" | "arena"; round: ArenaRound | null }> = [
+      { mode: "blind-box", round: null },
+      { mode: "elimination", round: null },
+      { mode: "arena", round: 1 },
+      { mode: "arena", round: 2 },
+      { mode: "arena", round: 3 },
+    ];
+
+    parsedData.multiTrueFalse.forEach((question, index) => {
+      const config = multiModes[index % multiModes.length];
+      payloads.push({
+        type: "multi-true-false",
+        question: question.question,
+        statements: question.statements.map((statement, i) => ({
+          id: labels[i].replace(".", ""),
+          label: labels[i],
+          text: statement.text,
+          correct: statement.correct,
+        })),
+        explanation: question.explanation,
+        gameModes: [config.mode],
+        arenaRound: config.round,
+      });
+    });
+
+    try {
+      setSaving(true);
+      const importedCount = await saveQuestionsBatch(payloads, user);
+
+      // Tóm tắt phân bổ
+      const runCount = payloads.filter((p) => p.type === "true-false" && p.gameModes.includes("run")).length;
+      const pirateCount = payloads.filter((p) => p.type === "true-false" && p.gameModes.includes("pirate")).length;
+      const boxCount = payloads.filter((p) => p.type === "multi-true-false" && p.gameModes.includes("blind-box")).length;
+      const elimCount = payloads.filter((p) => p.type === "multi-true-false" && p.gameModes.includes("elimination")).length;
+      const arenaCount = payloads.filter((p) => p.type === "multi-true-false" && p.gameModes.includes("arena")).length;
+
+      setFeedback({
+        tone: "success",
+        text: `✅ Đã nhập ${importedCount} câu! Đường Chạy: ${runCount} | Hải Tặc: ${pirateCount} | Hộp Bí Ẩn: ${boxCount} | Loại Trừ: ${elimCount} | Đấu Trường: ${arenaCount}`,
+      });
+      setParsedData(null);
+      setUploadMsg("");
+    } catch (saveError) {
+      setFeedback({
+        tone: "error",
+        text:
+          saveError instanceof Error
+            ? saveError.message
+            : "Không thể nhập câu hỏi hàng loạt lên Firebase.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
 
   const handleDeleteQuestion = async (questionId: string) => {
     try {
@@ -1073,15 +1162,32 @@ Giải thích: Fructose là ketose.
                     </div>
                   )}
 
+                  {/* Nút Phân bổ Tự động - ưu tiên hiển thị */}
+                  <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p className="text-sm font-black text-emerald-700">🎯 Phân bổ tự động (Khuyến nghị)</p>
+                    <p className="mt-1 text-xs text-emerald-600">
+                      Tự chia câu đơn → Đường Chạy &amp; Hải Tặc (xoay kẽ).
+                      Câu 4 ý → Hộp Bí Ẩn / Loại Trừ / Đấu Trường R1-R2-R3.
+                      <strong> Mỗi game một bộ câu riêng biệt!</strong>
+                    </p>
+                    <button
+                      onClick={importAutoDistribute}
+                      disabled={saving}
+                      className="mt-3 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 p-3 text-lg font-bold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {saving ? "Đang phân bổ lên Firebase..." : `✨ Phân bổ tự động ${parsedData.trueFalse.length + parsedData.multiTrueFalse.length} câu hỏi`}
+                    </button>
+                  </div>
+
+                  {/* Nút nhập theo cài đặt thủ công */}
                   <button
                     onClick={importAll}
                     disabled={saving}
-                    className="mt-2 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 p-3 text-lg font-bold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-2 w-full rounded-xl border-2 border-slate-300 bg-white p-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
                   >
-                    {saving
-                      ? "Đang nhập lên Firebase..."
-                      : `📥 Nhập ${(parsedData.trueFalse.length + parsedData.multiTrueFalse.length)} câu hỏi lên Firebase`}
+                    {saving ? "Đang nhập..." : "📥 Nhập theo cài đặt phân phối thủ công ở trên"}
                   </button>
+
                 </div>
               )}
             </div>
