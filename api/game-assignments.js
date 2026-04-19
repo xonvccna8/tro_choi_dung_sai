@@ -49,14 +49,8 @@ async function list(req, res) {
 
   if (teacherId && teacherId.startsWith("demo-")) {
     try {
-      const fs = require("fs");
-      const path = require("path");
-      const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
-      if (fs.existsSync(mockDataPath)) {
-        const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
-        const dbData = JSON.parse(dbRaw);
-        return sendJson(res, 200, { ok: true, assignments: dbData.gameAssignments || [] });
-      }
+      const dbData = require("./mock_db.json");
+      return sendJson(res, 200, { ok: true, assignments: dbData.gameAssignments || [] });
     } catch(e) {}
   }
 

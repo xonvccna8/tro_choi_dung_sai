@@ -50,21 +50,15 @@ async function list(req, res) {
 
   if ((teacherId && teacherId.startsWith("demo-")) || (assignmentId && assignmentId.startsWith("assign-"))) {
     try {
-      const fs = require("fs");
-      const path = require("path");
-      const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
-      if (fs.existsSync(mockDataPath)) {
-        const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
-        const dbData = JSON.parse(dbRaw);
-        
-        // Filter mock results by assignmentId if provided
-        let results = dbData.gameResults || [];
-        if (assignmentId) {
-          results = results.filter(r => r.assignmentId === assignmentId);
-        }
-        
-        return sendJson(res, 200, { ok: true, results });
+      const dbData = require("./mock_db.json");
+      
+      // Filter mock results by assignmentId if provided
+      let results = dbData.gameResults || [];
+      if (assignmentId) {
+        results = results.filter(r => r.assignmentId === assignmentId);
       }
+      
+      return sendJson(res, 200, { ok: true, results });
     } catch(e) {}
   }
 

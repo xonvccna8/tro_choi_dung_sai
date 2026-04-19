@@ -189,15 +189,9 @@ async function listQuestions(req, res) {
 
   if (teacherId && teacherId.startsWith("demo-")) {
     try {
-      const fs = require("fs");
-      const path = require("path");
-      const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
-      if (fs.existsSync(mockDataPath)) {
-        const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
-        const dbData = JSON.parse(dbRaw);
-        sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
-        return;
-      }
+      const dbData = require("./mock_db.json");
+      sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
+      return;
     } catch (e) {
       console.error("Lỗi đọc Mock DB trong listQuestions:", e);
     }
