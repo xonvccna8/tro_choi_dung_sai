@@ -12,6 +12,7 @@ import {
   Target,
   Trophy,
   Users,
+  Radio,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LogoutButton } from "../components/LogoutButton";
@@ -86,17 +87,31 @@ export function TeacherDashboardPage() {
       badge: "Tạo bài",
     },
     {
+      title: "Giao game",
+      href: "/teacher/game-assignments",
+      icon: <Target className="h-5 w-5" />,
+      colorBg: "bg-fuchsia-600",
+      badge: "Phân bài",
+    },
+    {
+      title: "Đối kháng",
+      href: "/games/direct",
+      icon: <Radio className="h-5 w-5" />,
+      colorBg: "bg-rose-600",
+      badge: "Thi Live",
+    },
+    {
       title: "Thống kê",
       href: "/teacher/stats",
       icon: <BarChart3 className="h-5 w-5" />,
-      colorBg: "bg-sky-600",
+      colorBg: "bg-amber-600",
       badge: "Tiến độ",
     },
     {
       title: "Lớp học",
       href: "/teacher/classes",
       icon: <Users className="h-5 w-5" />,
-      colorBg: "bg-rose-600",
+      colorBg: "bg-emerald-600",
       badge: "Quản lý",
     },
   ];
@@ -182,7 +197,7 @@ export function TeacherDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
                 {quickActions.map((action) => (
                   <Link
                     key={action.title}
