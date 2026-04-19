@@ -1,15 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=JetBrains+Mono:wght@400;500;700&subset=vietnamese&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
 
 * {
   box-sizing: border-box;
 }
 
+@layer base {
+  :root {
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(129 140 248 / 0.35);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(129 140 248 / 0.55);
+  }
+}
+
 body {
-  margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: var(--font-sans);
 }
 
 button {
   cursor: pointer;
   border: none;
+}
+
+@layer utilities {
+  .safe-pt {
+    padding-top: var(--safe-area-top);
+  }
+
+  .safe-pb {
+    padding-bottom: var(--safe-area-bottom);
+  }
+
+  .safe-pl {
+    padding-left: var(--safe-area-left);
+  }
+
+  .safe-pr {
+    padding-right: var(--safe-area-right);
+  }
+
+  .glass-panel {
+    @apply border border-white/10 bg-slate-900/60 shadow-[0_8px_32px_0_rgba(15,23,42,0.35)] backdrop-blur-xl;
+  }
+
+  .glass-card {
+    @apply rounded-2xl border border-white/10 bg-slate-900/50 shadow-lg backdrop-blur-lg;
+  }
 }

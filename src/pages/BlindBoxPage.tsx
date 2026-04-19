@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { ChemText } from "../components/ChemText";
+import { RichContentBlock } from "../components/RichContent";
 import { GameShell } from "../components/GameShell";
-import { multiTrueFalseQuestions } from "../data/questions";
+import { QuestionBankNotice } from "../components/QuestionBankNotice";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import { filterMultiTrueFalseQuestionsByMode } from "../lib/questionBank";
 import { useGameStore } from "../store/useGameStore";
 import { scoreLabel } from "../types";
 import type { ErrorRecord } from "../types";
@@ -15,13 +18,57 @@ export function BlindBoxPage() {
   const addErrors = useGameStore((s) => s.addErrors);
   const addPerfect = useGameStore((s) => s.addPerfect);
   const soundOn = useGameStore((s) => s.soundOn);
-  const customMultiTrueFalseQuestions = useGameStore((s) => s.customMultiTrueFalseQuestions);
+  const { questions, loading, error, isConfigured } = useQuestionBank();
   const [progress, setProgress] = useState(0);
   const [opened, setOpened] = useState<string>("");
   const [resultMessage, setResultMessage] = useState("");
-  const pool = [...customMultiTrueFalseQuestions, ...multiTrueFalseQuestions];
-  const q = pool[progress % pool.length];
   const [answerMap, setAnswerMap] = useState<Record<string, boolean>>({});
+  const pool = filterMultiTrueFalseQuestionsByMode(questions, "blind-box");
+
+  if (!isConfigured) {
+    return (
+      <GameShell title="Hộp Bí Ẩn" subtitle="Hoàn thành 3 câu 4 ý Đúng/Sai để nhận vé">
+        <QuestionBankNotice
+          title="Firebase chưa sẵn sàng"
+          description="Game này đã chuyển sang dùng câu hỏi 4 ý từ Firebase. Hãy cấu hình Firebase rồi tạo câu hỏi cho Hộp Bí Ẩn."
+          tone="amber"
+        />
+      </GameShell>
+    );
+  }
+
+  if (loading) {
+    return (
+      <GameShell title="Hộp Bí Ẩn" subtitle="Hoàn thành 3 câu 4 ý Đúng/Sai để nhận vé">
+        <QuestionBankNotice
+          title="Đang đồng bộ câu hỏi"
+          description="Hệ thống đang tải câu hỏi cho Hộp Bí Ẩn từ Firebase."
+          hideAction
+        />
+      </GameShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <GameShell title="Hộp Bí Ẩn" subtitle="Hoàn thành 3 câu 4 ý Đúng/Sai để nhận vé">
+        <QuestionBankNotice title="Không tải được câu hỏi" description={error} tone="rose" />
+      </GameShell>
+    );
+  }
+
+  if (pool.length === 0) {
+    return (
+      <GameShell title="Hộp Bí Ẩn" subtitle="Hoàn thành 3 câu 4 ý Đúng/Sai để nhận vé">
+        <QuestionBankNotice
+          title="Chưa có câu hỏi cho Hộp Bí Ẩn"
+          description="Hãy tạo ít nhất 1 câu 4 ý và gắn nó cho game Hộp Bí Ẩn trong trình tạo câu hỏi."
+        />
+      </GameShell>
+    );
+  }
+
+  const q = pool[progress % pool.length];
 
   const submit = () => {
     const correctCount = q.statements.filter((s) => answerMap[s.id] === s.correct).length;
@@ -70,7 +117,7 @@ export function BlindBoxPage() {
     <GameShell title="Hộp Bí Ẩn" subtitle="Hoàn thành 3 câu 4 ý Đúng/Sai để nhận vé">
       <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
         <p className="font-bold">Tiến độ: {progress}/3</p>
-        <p className="mt-2"><ChemText text={q.question} /></p>
+        <RichContentBlock text={q.question} className="mt-2 text-slate-800" />
         {q.statements.map((s) => {
           const picked = answerMap[s.id];
           return (

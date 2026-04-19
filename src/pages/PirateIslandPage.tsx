@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
 import { ChemText } from "../components/ChemText";
+import { RichContentBlock } from "../components/RichContent";
 import { GameShell } from "../components/GameShell";
 import { ConfettiRain, CoinBurst, StarBlast } from "../components/Effects";
-import { multiTrueFalseQuestions, trueFalseQuestions } from "../data/questions";
+import { QuestionBankNotice } from "../components/QuestionBankNotice";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import { filterMultiTrueFalseQuestionsByMode, filterTrueFalseQuestionsByMode } from "../lib/questionBank";
 import { useGameStore } from "../store/useGameStore";
 import { calcRealScore, scoreLabel } from "../types";
 import type { ErrorRecord } from "../types";
@@ -14,8 +17,7 @@ export function PirateIslandPage() {
   const addErrors = useGameStore((s) => s.addErrors);
   const addPerfect = useGameStore((s) => s.addPerfect);
   const soundOn = useGameStore((s) => s.soundOn);
-  const customTrueFalseQuestions = useGameStore((s) => s.customTrueFalseQuestions);
-  const customMultiTrueFalseQuestions = useGameStore((s) => s.customMultiTrueFalseQuestions);
+  const { questions, loading, error, isConfigured } = useQuestionBank();
   const [burst, setBurst] = useState(0);
   const [stars, setStars] = useState(0);
   const [confetti, setConfetti] = useState(0);
@@ -25,8 +27,52 @@ export function PirateIslandPage() {
   const [attackMessage, setAttackMessage] = useState("");
   const [tfIndex, setTfIndex] = useState(0);
   const [mtfIndex, setMtfIndex] = useState(0);
-  const tfPool = useMemo(() => [...customTrueFalseQuestions, ...trueFalseQuestions], [customTrueFalseQuestions]);
-  const mtfPool = useMemo(() => [...customMultiTrueFalseQuestions, ...multiTrueFalseQuestions], [customMultiTrueFalseQuestions]);
+  const tfPool = useMemo(() => filterTrueFalseQuestionsByMode(questions, "pirate"), [questions]);
+  const mtfPool = useMemo(() => filterMultiTrueFalseQuestionsByMode(questions, "pirate"), [questions]);
+
+  if (!isConfigured) {
+    return (
+      <GameShell title="Đảo Hải Tặc" subtitle="Đúng/Sai để quay thưởng và tấn công">
+        <QuestionBankNotice
+          title="Firebase chưa sẵn sàng"
+          description="Đảo Hải Tặc cần cả câu Đúng/Sai đơn và câu 4 ý từ Firebase. Hãy cấu hình Firebase rồi tạo câu hỏi phù hợp cho game này."
+          tone="amber"
+        />
+      </GameShell>
+    );
+  }
+
+  if (loading) {
+    return (
+      <GameShell title="Đảo Hải Tặc" subtitle="Đúng/Sai để quay thưởng và tấn công">
+        <QuestionBankNotice
+          title="Đang đồng bộ câu hỏi"
+          description="Hệ thống đang tải câu hỏi cho Đảo Hải Tặc từ Firebase."
+          hideAction
+        />
+      </GameShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <GameShell title="Đảo Hải Tặc" subtitle="Đúng/Sai để quay thưởng và tấn công">
+        <QuestionBankNotice title="Không tải được câu hỏi" description={error} tone="rose" />
+      </GameShell>
+    );
+  }
+
+  if (tfPool.length === 0 || mtfPool.length === 0) {
+    return (
+      <GameShell title="Đảo Hải Tặc" subtitle="Đúng/Sai để quay thưởng và tấn công">
+        <QuestionBankNotice
+          title="Chưa đủ câu hỏi cho Đảo Hải Tặc"
+          description={`Game này cần cả câu Đúng/Sai đơn và câu 4 ý. Hiện có ${tfPool.length} câu đơn và ${mtfPool.length} câu 4 ý được gắn cho Đảo Hải Tặc.`}
+        />
+      </GameShell>
+    );
+  }
+
   const tf = tfPool[tfIndex % tfPool.length];
   const mtf = mtfPool[mtfIndex % mtfPool.length];
 
@@ -120,7 +166,7 @@ export function PirateIslandPage() {
 
       <div className="relative mt-4 rounded-3xl bg-white/95 p-4 shadow-xl">
         <h2 className="font-black text-violet-700">Tấn công boss (4 ý Đúng/Sai)</h2>
-        <p className="mt-2">{mtf.question}</p>
+        <RichContentBlock text={mtf.question} className="mt-2 text-slate-800" />
         <div className="mt-3 space-y-2">
           {mtf.statements.map((s) => (
             <div key={s.id} className="rounded-xl bg-slate-100 p-3">

@@ -48,7 +48,7 @@ export async function downloadWordTemplate() {
             spacing: { after: 100 },
             children: [
               new TextRun({
-                text: "MẪU SOẠN CÂU HỎI ĐÚNG/SAI – HÓA HỌC 12",
+                text: "MẪU SOẠN CÂU HỎI ĐÚNG/SAI – TOÁN HỌC 12",
                 bold: true,
                 size: 32,
                 color: "4A148C",
@@ -61,7 +61,7 @@ export async function downloadWordTemplate() {
             spacing: { after: 200 },
             children: [
               new TextRun({
-                text: "Trò Chơi Đúng Sai – Ôn tập Hóa học hiệu quả",
+                text: "Trò Chơi Học Thuật – Ôn tập Toán học hiệu quả",
                 italics: true,
                 size: 24,
                 color: "7B1FA2",
@@ -83,12 +83,15 @@ export async function downloadWordTemplate() {
           createFormatTable(),
           emptyLine(),
 
-          // ═══ CÔNG THỨC HÓA HỌC ═══
-          createSectionHeader("🧪 CÁCH GÕ CÔNG THỨC HÓA HỌC"),
-          createBullet("Chỉ số dưới: gõ bình thường → H2SO4, C6H12O6 (hệ thống tự chuyển)"),
-          createBullet("Chỉ số trên (ion): dùng ^{...} → Fe^{2+}, SO4^{2-}, Cu^{2+}"),
-          createBullet("Mũi tên phản ứng: dùng -> (thuận) hoặc <-> (thuận nghịch)"),
-          createBullet("Nhiệt độ: (delta) → Δ  |  (deg) → °  |  (xt) → xúc tác"),
+          // ═══ CÔNG THỨC TOÁN HỌC ═══
+          createSectionHeader("🧪 CÁCH GÕ CÔNG THỨC TOÁN HỌC (KaTeX)"),
+          createBullet("Đặt toàn bộ công thức vào cặp ký hiệu $...$"),
+          createBullet("Phân số: gõ $\\frac{a}{b}$"),
+          createBullet("Mũ/Lũy thừa: gõ $x^2$, $e^x$"),
+          createBullet("Căn bậc hai: gõ $\\sqrt{x^2 + 1}$"),
+          createBullet("Tích phân: gõ $\\int_0^1 f(x)dx$"),
+          createBullet("Giới hạn: gõ $\\lim_{x \\to \\infty}$"),
+          createBullet("Vô cùng: gõ $+\\infty$ hoặc $-\\infty$"),
           emptyLine(),
 
           // ═══ MẸO SOẠN CÂU HỎI CHẤT LƯỢNG ═══
@@ -98,7 +101,7 @@ export async function downloadWordTemplate() {
           createNumberedItem("3", "Dùng từ khóa bẫy: 'chỉ', 'luôn luôn', 'tất cả', 'duy nhất', 'không bao giờ'."),
           createNumberedItem("4", "Nên có 2 ý Đúng + 2 ý Sai trong mỗi câu 4 ý (cân bằng)."),
           createNumberedItem("5", "Luôn viết Giải thích để học sinh hiểu khi ôn sai."),
-          createNumberedItem("6", "Bám sát SGK Hóa 12 và đề thi tham khảo Bộ GD&ĐT."),
+          createNumberedItem("6", "Bám sát SGK Toán 12 và đề thi tham khảo Bộ GD&ĐT 2025."),
           emptyLine(),
 
           // ═══════════════════════════════════════════════
@@ -147,6 +150,26 @@ export async function downloadWordTemplate() {
           // ═══════════════════════════════════════════════
           createSectionHeader("═══ PHẦN 2: CÂU 4 Ý ĐÚNG/SAI (GIỐNG ĐỀ THI) ═══"),
           createNote("Mỗi câu nằm giữa 2 dòng --- | Có đúng 4 ý a, b, c, d"),
+          createNote("Bạn có thể viết đoạn dẫn NHIỀU DÒNG trước các ý a, b, c, d. Hệ thống đã hỗ trợ dạng câu dài giống đề thi có bảng/số liệu."),
+          emptyLine(),
+
+          createChapterHeader("MẪU 4 Ý KIỂU ĐỀ THI DÀI (CÓ ĐOẠN DẪN + BẢNG SỐ LIỆU)"),
+          ...createRichStemMultiQuestion(
+            [
+              "NAP 3: Thép là hợp kim của iron (Fe) và carbon, vốn dễ bị ăn mòn khi tiếp xúc với nước biển giàu oxygen và muối. Để bảo vệ thép, người ta thường dùng phương pháp điện hóa (gắn khối Mg làm vật hi sinh) hoặc sơn phủ bề mặt.",
+              "Tuy nhiên, các loại sơn truyền thống chứa lead (Pb) hoặc chromium (Cr) thường gây độc và tích tụ sinh học trong sinh vật biển. Do đó, xu hướng hiện nay là phát triển sơn bio-polymer từ nguyên liệu tái tạo kết hợp với nano silica SiO2. Loại sơn mới này vừa thân thiện với môi trường, vừa tạo lớp màng ngăn cách có độ bám dính và độ kín khít cao, giúp bảo vệ công trình bền vững hơn.",
+              "Bảng. Thế điện cực chuẩn của một số cặp oxi hóa - khử:",
+              "Cặp oxi hóa - khử | Mg^{2+}/Mg | Fe^{2+}/Fe | Sn^{2+}/Sn",
+              "E^0 (V) | -2,37 | -0,44 | -0,14",
+            ],
+            [
+              { label: "a", correct: false, text: "Khi gắn khối Mg vào chân giàn khoan bằng thép, nó sẽ đóng vai trò là cathode và bị oxi hóa thay cho iron (Fe)." },
+              { label: "b", correct: false, text: "Phương pháp bảo vệ bề mặt làm thay đổi thế điện cực chuẩn của kim loại, từ đó hạn chế quá trình oxi hóa xảy ra trên bề mặt kim loại." },
+              { label: "c", correct: false, text: "Gắn thiếc (Sn) lên vỏ tàu thép được xem là phương pháp bảo vệ điện hóa giúp ngăn ngừa quá trình ăn mòn kim loại." },
+              { label: "d", correct: true, text: "Việc lựa chọn sơn bio-polymer nano thay thế cho các dòng sơn chứa lead hay chromium là một phương án đề xuất phù hợp nhằm giải quyết vấn đề ô nhiễm thứ cấp từ kim loại nặng trong môi trường biển." },
+            ],
+            "a sai vì Mg là anode hi sinh, bị oxi hóa thay cho iron. b sai vì sơn phủ chỉ cách ly kim loại khỏi môi trường, không làm thay đổi thế điện cực chuẩn. c sai vì Sn có E^0 lớn hơn Fe nên khi lớp phủ bị trầy xước, iron bị ăn mòn nhanh hơn. d đúng vì sơn bio-polymer nano giúp giảm nguy cơ phát tán kim loại nặng độc hại ra môi trường biển."
+          ),
           emptyLine(),
 
           // Câu 1
@@ -358,6 +381,71 @@ function createMultiQuestion(
   );
 
   // Closing ---
+  paragraphs.push(
+    new Paragraph({
+      children: [new TextRun({ text: "---", bold: true, size: 24, color: "9E9E9E" })],
+    }),
+  );
+
+  return paragraphs;
+}
+
+function createRichStemMultiQuestion(
+  stemLines: string[],
+  statements: { label: string; correct: boolean; text: string }[],
+  explanation: string,
+): Paragraph[] {
+  const paragraphs: Paragraph[] = [];
+
+  paragraphs.push(
+    new Paragraph({
+      spacing: { before: 100 },
+      children: [new TextRun({ text: "---", bold: true, size: 24, color: "9E9E9E" })],
+    }),
+  );
+
+  stemLines.forEach((line, index) => {
+    paragraphs.push(
+      new Paragraph({
+        spacing: { after: 30 },
+        children: [
+          new TextRun({
+            text: line,
+            bold: index === 0,
+            italics: index === 2,
+            size: 24,
+            color: index === 2 ? "1565C0" : undefined,
+          }),
+        ],
+      }),
+    );
+  });
+
+  for (const s of statements) {
+    const tag = s.correct ? "[ĐÚNG]" : "[SAI]";
+    const tagColor = s.correct ? "2E7D32" : "C62828";
+    paragraphs.push(
+      new Paragraph({
+        spacing: { after: 30 },
+        children: [
+          new TextRun({ text: `${s.label}. `, bold: true, size: 24, color: "1565C0" }),
+          new TextRun({ text: `${tag} `, bold: true, size: 24, color: tagColor }),
+          new TextRun({ text: s.text, size: 24 }),
+        ],
+      }),
+    );
+  }
+
+  paragraphs.push(
+    new Paragraph({
+      spacing: { after: 40 },
+      children: [
+        new TextRun({ text: "Giải thích: ", bold: true, size: 22, color: "E65100" }),
+        new TextRun({ text: explanation, italics: true, size: 22, color: "616161" }),
+      ],
+    }),
+  );
+
   paragraphs.push(
     new Paragraph({
       children: [new TextRun({ text: "---", bold: true, size: 24, color: "9E9E9E" })],

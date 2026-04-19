@@ -1,0 +1,37 @@
+====================================================================
+      HỆ THỐNG TRÒ CHƠI HỌC THUẬT ĐÚNG/SAI - PHIÊN BẢN TOÁN 12
+====================================================================
+
+Hệ thống được thiết kế theo chuẩn cấu trúc thi tốt nghiệp THPT mới (từ 2025) của Bộ Giáo dục & Đào tạo, hỗ trợ tối đa cho Giáo viên môn Toán khối 12 với các tính năng vượt trội:
+
+1. QUẢN LÝ LỚP HỌC & DỮ LIỆU ĐỘC LẬP
+--------------------------------------------------------------------
+- Tài khoản cá nhân hóa: Mỗi giáo viên có một không gian làm việc hoàn toàn độc lập. Giáo viên Toán 12 sẽ không bị lẫn lộn câu hỏi với giáo viên các môn hay khối khác.
+- Quản lý học sinh: Giáo viên tạo lớp (VD: 12A1, 12A2, Luyện Thi Khối A), hệ thống sinh mã mời. Học sinh gia nhập lớp nào sẽ chỉ làm bài tập Toán của giáo viên đó cấu hình.
+
+2. SOẠN THẢO CÂU HỎI TOÁN HỌC CHUYÊN SÂU
+--------------------------------------------------------------------
+- Định dạng chuẩn 2025: Hỗ trợ linh hoạt dạng câu hỏi Đúng/Sai đơn lẻ và dạng thi 4 ý (1 câu dẫn, 4 ý a,b,c,d chọn đúng/sai).
+- Hỗ trợ công cụ Toán học KaTeX/LaTeX: Viết mọi công thức giải tích, hình học không gian Oxyz, số phức, tích phân, đạo hàm chuẩn form SGK một cách dễ dàng chỉ bằng cách đặt trong cặp dấu $...$ (VD: $\int_{0}^{1} x^2 dx$, $\lim_{x \to \infty} \frac{1}{x}$).
+- Chấm điểm cực chuẩn: Điểm câu 4 ý tự động chia theo quy chế của BGD (1 ý đúng đc 0.1đ, 2 ý đc 0.25đ, 3 ý đc 0.5đ, 4 ý đc 1.0đ).
+
+3. TRỢ LÝ TRÍ TUỆ NHÂN TẠO (AI) TẠO CÂU HỎI
+--------------------------------------------------------------------
+- Generative AI tích hợp: AI đã được huấn luyện để hiểu cấu trúc môn Toán 12. Giáo viên chỉ cần nhập chủ đề (VD: "Cực trị hàm số", "Mặt cầu Oxyz") hoặc tải lên đề cương/file PDF tài liệu. 
+- Auto-Search AI: Hệ thống tự động phân loại, tìm kiếm tài liệu giáo dục từ internet để trích xuất hoặc gợi ý câu hỏi phần Toán 12 nhanh chóng nhất mà vẫn đảm bảo tính chính xác học thuật.
+
+4. HỆ SINH THÁI GAME HỌC TẬP TƯƠNG TÁC
+--------------------------------------------------------------------
+Biến các bài tập khô khan thành trò chơi giúp học sinh tăng tương tác:
+- Chạy Vô Tận (Endless Run) & Hải Tặc (Pirate Island): Luyện phản xạ nhanh với các định lý, công thức Toán, lý thuyết hình học cơ bản.
+- Hộp Mù (Blind Box) & Loại Trừ (Elimination): Dành cho các câu hỏi kiểm tra ngẫu nhiên, tạo sự hồi hộp kích thích khi ôn bài.
+- Đấu Trường Học Thuật (Academic Arena) & Live Battle: Tính năng làm bài kiểm tra đồng loạt tại lớp. Học sinh thi đấu với nhau để giành top 1 trên bảng xếp hạng (Leaderboard) qua 3 vòng thi như đấu trường sinh tử.
+- Bệnh Viện Ôn Tập (Error Book): Tính năng "chữa lành" cực quan trọng: Tự động gom những câu Toán 12 mà học sinh thường tính sai dấu, nhầm công thức... giúp nhắm đúng lỗ hổng cá nhân để ôn tập lại.
+
+5. BẢNG XẾP HẠNG & THỐNG KÊ (DASHBOARD)
+--------------------------------------------------------------------
+- Thống kê minh bạch: Giáo viên dễ dàng theo dõi tiến độ của học sinh trực quan qua Dashboard: em nào làm sai phần "Khảo sát hàm số" nhiều, phần nào lớp đã nắm vững.
+- Export báo cáo: Xem chi tiết báo cáo thời gian làm bài, tỷ lệ đúng/sai của cả lớp.
+
+====================================================================
+KẾT LUẬN: Với hệ thống này, giáo viên Toán 12 chỉ cần tập trung vào việc soạn hoặc dùng AI để gen câu hỏi trắc nghiệm Đ/S. Mọi công đoạn như giao bài, làm bài tập nhóm, thi đấu tại lớp, ôn tập kiến thức cũ và chấm điểm sẽ được tự động hoá và game hoá 100%.

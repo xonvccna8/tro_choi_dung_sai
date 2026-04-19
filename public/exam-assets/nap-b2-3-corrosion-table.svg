@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 240" role="img" aria-labelledby="title desc">
+  <title id="title">Bảng thế điện cực chuẩn</title>
+  <desc id="desc">Bảng thế điện cực chuẩn của ba cặp oxi hóa khử Mg2 cộng trên Mg, Fe2 cộng trên Fe và Sn2 cộng trên Sn.</desc>
+  <defs>
+    <style>
+      .title { font: italic 700 24px 'Times New Roman', serif; fill: #2563eb; }
+      .cell { fill: #ffffff; stroke: #60a5fa; stroke-width: 2; }
+      .text { font: 22px 'Times New Roman', serif; fill: #111827; }
+    </style>
+  </defs>
+  <text x="240" y="34" class="title">Bảng. Thế điện cực chuẩn của một số cặp oxi hóa - khử</text>
+  <g transform="translate(40,60)">
+    <rect class="cell" x="0" y="0" width="280" height="60" />
+    <rect class="cell" x="280" y="0" width="180" height="60" />
+    <rect class="cell" x="460" y="0" width="180" height="60" />
+    <rect class="cell" x="640" y="0" width="180" height="60" />
+    <rect class="cell" x="0" y="60" width="280" height="60" />
+    <rect class="cell" x="280" y="60" width="180" height="60" />
+    <rect class="cell" x="460" y="60" width="180" height="60" />
+    <rect class="cell" x="640" y="60" width="180" height="60" />
+    <text x="140" y="38" text-anchor="middle" class="text">Cặp oxi hóa - khử</text>
+    <text x="370" y="38" text-anchor="middle" class="text">Mg²⁺/Mg</text>
+    <text x="550" y="38" text-anchor="middle" class="text">Fe²⁺/Fe</text>
+    <text x="730" y="38" text-anchor="middle" class="text">Sn²⁺/Sn</text>
+    <text x="140" y="98" text-anchor="middle" class="text">E° (V)</text>
+    <text x="370" y="98" text-anchor="middle" class="text">-2,37</text>
+    <text x="550" y="98" text-anchor="middle" class="text">-0,44</text>
+    <text x="730" y="98" text-anchor="middle" class="text">-0,14</text>
+  </g>
+</svg>

@@ -2,7 +2,7 @@ import { ChemText } from "./ChemText";
 
 const categories = [
   {
-    label: "Acid & Base",
+    label: "Axit & Bazơ",
     items: [
       { display: "H2SO4", insert: "H2SO4" },
       { display: "HCl", insert: "HCl" },

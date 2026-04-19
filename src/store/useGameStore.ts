@@ -1,15 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ExamResult, ErrorRecord, MultiTrueFalseQuestion, TrueFalseQuestion } from "../types";
+import type { AppUser, ExamResult, ErrorRecord } from "../types";
 
-type AppUser = {
-  id: string;
-  name: string;
-  avatar: string;
-  role: "admin" | "teacher" | "student";
-};
-
-type GameStore = {
+type PersistedGameState = {
   user: AppUser | null;
   level: number;
   exp: number;
@@ -18,22 +11,20 @@ type GameStore = {
   collection: string[];
   leaderboardScore: number;
   soundOn: boolean;
-  customTrueFalseQuestions: TrueFalseQuestion[];
-  customMultiTrueFalseQuestions: MultiTrueFalseQuestion[];
   examHistory: ExamResult[];
   errorBook: ErrorRecord[];
   perfectCount: number;
+};
+
+type GameStore = PersistedGameState & {
   setUser: (user: AppUser) => void;
+  logout: () => void;
   addGold: (amount: number) => void;
   addExp: (amount: number) => void;
   addCollection: (item: string) => void;
   increaseStreak: () => void;
   resetStreak: () => void;
   toggleSound: () => void;
-  addCustomTrueFalseQuestion: (question: TrueFalseQuestion) => void;
-  addCustomMultiTrueFalseQuestion: (question: MultiTrueFalseQuestion) => void;
-  removeCustomTrueFalseQuestion: (id: string) => void;
-  removeCustomMultiTrueFalseQuestion: (id: string) => void;
   addExamResult: (result: ExamResult) => void;
   addErrors: (errors: ErrorRecord[]) => void;
   removeError: (id: string) => void;
@@ -41,23 +32,26 @@ type GameStore = {
   addPerfect: () => void;
 };
 
+const initialState: PersistedGameState = {
+  user: null,
+  level: 1,
+  exp: 0,
+  gold: 0,
+  streak: 0,
+  collection: [],
+  leaderboardScore: 0,
+  soundOn: true,
+  examHistory: [],
+  errorBook: [],
+  perfectCount: 0,
+};
+
 export const useGameStore = create<GameStore>()(
   persist(
     (set) => ({
-      user: null,
-      level: 1,
-      exp: 0,
-      gold: 0,
-      streak: 0,
-      collection: [],
-      leaderboardScore: 0,
-      soundOn: true,
-      customTrueFalseQuestions: [],
-      customMultiTrueFalseQuestions: [],
-      examHistory: [],
-      errorBook: [],
-      perfectCount: 0,
+      ...initialState,
       setUser: (user) => set({ user }),
+      logout: () => set({ user: null }),
       addGold: (amount) => set((state) => ({ gold: state.gold + amount })),
       addExp: (amount) =>
         set((state) => {
@@ -76,18 +70,6 @@ export const useGameStore = create<GameStore>()(
       increaseStreak: () => set((state) => ({ streak: state.streak + 1 })),
       resetStreak: () => set({ streak: 0 }),
       toggleSound: () => set((state) => ({ soundOn: !state.soundOn })),
-      addCustomTrueFalseQuestion: (question) =>
-        set((state) => ({ customTrueFalseQuestions: [question, ...state.customTrueFalseQuestions] })),
-      addCustomMultiTrueFalseQuestion: (question) =>
-        set((state) => ({ customMultiTrueFalseQuestions: [question, ...state.customMultiTrueFalseQuestions] })),
-      removeCustomTrueFalseQuestion: (id) =>
-        set((state) => ({
-          customTrueFalseQuestions: state.customTrueFalseQuestions.filter((q) => q.id !== id),
-        })),
-      removeCustomMultiTrueFalseQuestion: (id) =>
-        set((state) => ({
-          customMultiTrueFalseQuestions: state.customMultiTrueFalseQuestions.filter((q) => q.id !== id),
-        })),
       addExamResult: (result) =>
         set((state) => ({ examHistory: [result, ...state.examHistory].slice(0, 50) })),
       addErrors: (errors) =>
@@ -97,6 +79,10 @@ export const useGameStore = create<GameStore>()(
       clearErrorBook: () => set({ errorBook: [] }),
       addPerfect: () => set((state) => ({ perfectCount: state.perfectCount + 1 })),
     }),
-    { name: "tf-game-storage" },
+    {
+      name: "tf-game-storage",
+      version: 2,
+      migrate: () => initialState,
+    },
   ),
 );

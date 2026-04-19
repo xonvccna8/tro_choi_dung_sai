@@ -1,4 +1,79 @@
+﻿# ========================================
+# MAU SOAN CAU HOI DUNG/SAI - TOAN HOC 12
 # ========================================
+#
+# HUONG DAN SU DUNG:
+# 1. Soan cau hoi theo format ben duoi
+# 2. Luu file dang .txt (chu y ma hoa UTF-8 de hien thi tieng Viet)
+# 3. Tai len trang "Tao Cau Hoi" > tab "Tai file len"
+#
+# CACH GO CONG THUC TOAN HOC (Su dung KaTeX bang cap dau $...$):
+# - Phan so: $\frac{a}{b}$
+# - Luy thua: $x^2$, $e^x$
+# - Can bac hai: $\sqrt{x^2 + 1}$
+# - Tich phan: $\int_0^1 f(x)dx$
+# - Toa do, vector: $\vec{a} = (1; 2; 3)$ hoac $(P): 2x+y-z=0$
+# - Dau vo cung: $+\infty$, $-\infty$
+#
+# VÍ DỤ: Ham so $y = \frac{2x+1}{x-1}$ co do thi (C).
+#
+# LUU Y QUAN TRONG:
+# - Dong bat dau bang # la dong ghi chu (he thong bo qua)
+# - Ban co the de trong dong giua cac cau cho de doc
+# - Tu khoa bat buoc: [DUNG] hoac [SAI] (can viet IN HOA)
+#
+# ========================================
+
+## ======================================
+## PHAN 1: CAU DON DUNG/SAI
+## Format: [DUNG] hoac [SAI] Menh de | Giai thich (khong bat buoc)
+## ======================================
+
+[DUNG] Do thi ham so $y = \frac{2x+1}{x-1}$ co tiem can dung $x = 1$. | Vi diem ky di lam cho mau bang 0 va tu khac 0 la 1.
+
+[SAI] The tich khoi lap phuong canh $2a$ la $4a^3$. | The tich cua khoi lap phuong canh $2a$ phai la $V = (2a)^3 = 8a^3$.
+
+[DUNG] Cho so phuc $z = 3 - 4i$. Mo-dun cua $z$ la $|z| = 5$. | $|z| = \sqrt{3^2 + (-4)^2} = \sqrt{25} = 5$.
+
+[SAI] Trong khong gian $Oxyz$, mat phang $(P): 2x - y + 3z - 1 = 0$ co vector phap tuyen la $\vec{n} = (2; 1; 3)$. | Vector phap tuyen dung cua mat phang la $\vec{n} = (2; -1; 3) \neq (2; 1; 3)$.
+
+[DUNG] Tich phan $\int_0^1 e^x dx = e - 1$. | Ho nguyen ham la $e^x$, cho can $0 \to 1$ ta duoc $e^1 - e^0 = e - 1$.
+
+
+## ======================================
+## PHAN 2: CAU 4 Y DUNG/SAI (CHUAN BGD 2025)
+## Format: Giua 2 dau ---
+## Dong 1: Cau hoi/ Cau dan chung
+## Dong 2-5: a/b/c/d. [DUNG] hoac [SAI] Noi dung y
+## Dong cuoi (Bat dau bang 'Giai thich:'): Loi giai chi tiet ca 4 y.
+## ======================================
+
+---
+Cho ham so $y = x^3 - 3x^2 + 2$ co do thi (C). Nhung menh de sau dung hay sai?
+a. [DUNG] Ham so dong bien tren cac khoang $(-\infty; 0)$ va $(2; +\infty)$.
+b. [SAI] Ham so dat cuc dai tai diem $x = 2$.
+c. [DUNG] Do thi (C) cat truc tung tai diem co tung do bang $2$.
+d. [SAI] Gia tri nho nhat cua ham so tren doan $[0; 3]$ la $-1$.
+Giai thich: Dao ham $y' = 3x^2 - 6x$; $y'=0$ tai $x=0$ va $x=2$. Ham doi dau tu sang + qua 2 nen x=2 la diem cuc tieu (Y b sai). Kiem tra tung do: $y(0)=2$ (Y c dung). Tren doan [0;3], kiem tra ba vi tri x=0, 2, 3 thi $\min y = y(2) = -2 \neq -1$ (Y d sai).
+---
+
+---
+Trong khong gian he toan do $Oxyz$, cho cac diem $A(1; 0; 0), B(0; 2; 0), C(0; 0; 3)$.
+a. [DUNG] Phuong trinh mat phang $(ABC)$ la $\frac{x}{1} + \frac{y}{2} + \frac{z}{3} = 1$.
+b. [SAI] $\vec{AB} \cdot \vec{AC} = 0$.
+c. [DUNG] The tich khoi tu dien $OABC$ bang $1$.
+d. [SAI] Khoang cach tu $O$ den mat phang $(ABC)$ bang $1$.
+Giai thich: Y a la ptmp theo doan chan. Y c dung cong thuc $V = \frac{1}{6} \cdot 1 \cdot 2 \cdot 3 = 1$. Y d sai do khoang cach nghich dao la $\frac{1}{h^2} = 1 + \frac{1}{4} + \frac{1}{9} = \frac{49}{36} \Rightarrow h = \frac{6}{7}$.
+---
+
+---
+Cho so phuc $z$ thoa man phuong trinh $(1+i)z = 3 - i$.
+a. [SAI] Phan thuc cua $z$ bang $2$.
+b. [DUNG] Phan ao cua $z$ bang $-2$.
+c. [DUNG] Diem bieu dien so phuc $z$ nam tren goc phan tu thu $(IV)$ cua mat phang toa do.
+d. [SAI] So phuc lien hop cua $z$ la $\bar{z} = -1 - 2i$.
+Giai thich: Bien doi phuong trinh ta duoc $z = \frac{3-i}{1+i} = 1 - 2i$. => Phan thuc bang $1 \neq 2$ (Y a sai). Phan ao la $-2$ (Y b dung). Toa do diem la $(1; -2)$ thuoc goc phan tu $(IV)$ (Y c dung). So lien hop la $1 + 2i$ (Y d sai).
+---# ========================================
 # MAU SOAN CAU HOI DUNG/SAI - HOA HOC
 # ========================================
 #
@@ -9,16 +84,16 @@
 #
 # CACH GO CONG THUC HOA HOC:
 # - Chi so duoi: go binh thuong
-#   Vi du: H2SO4 hien thi thanh H₂SO₄
-#   Vi du: C6H12O6 hien thi thanh C₆H₁₂O₆
+#   Vi du: H2SO4 hien thi thanh Hâ‚‚SOâ‚„
+#   Vi du: C6H12O6 hien thi thanh Câ‚†Hâ‚â‚‚Oâ‚†
 #
 # - Chi so tren (ion, dien tich): dung ^{...}
-#   Vi du: Fe^{2+} hien thi thanh Fe²⁺
-#   Vi du: SO4^{2-} hien thi thanh SO₄²⁻
+#   Vi du: Fe^{2+} hien thi thanh FeÂ²âº
+#   Vi du: SO4^{2-} hien thi thanh SOâ‚„Â²â»
 #
-# - Mui ten phan ung: -> (→), <-> (⇌)
-# - Delta: (delta) → Δ
-# - Do: (deg)C → °C
+# - Mui ten phan ung: -> (â†’), <-> (â‡Œ)
+# - Delta: (delta) â†’ Î”
+# - Do: (deg)C â†’ Â°C
 #
 # LUU Y:
 # - Dong bat dau bang # la ghi chu (se bo qua)

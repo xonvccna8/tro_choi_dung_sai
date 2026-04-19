@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">Phenol, NaOH va CO2 trong ong nghiem</title>
+  <desc id="desc">So do ba ong nghiem A, B, C mo ta phenol trong nuoc, them NaOH va suc khi CO2.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#1f2937" />
+    </marker>
+    <style>
+      .tube { fill: none; stroke: #334155; stroke-width: 5; stroke-linecap: round; }
+      .liquid { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 2; }
+      .bubble { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.5; }
+      .label { font: 24px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .small { font: 20px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .step { font: 700 24px 'Segoe UI', Arial, sans-serif; fill: #2563eb; }
+      .mark { font: 700 32px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+      .arrow { stroke: #1f2937; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="40" y="40" class="step">NAP 1 - Thi nghiem voi phenol</text>
+
+  <g transform="translate(90,80)">
+    <path class="tube" d="M40 10 L40 240 Q40 275 75 285 L125 285 Q160 275 160 240 L160 10" />
+    <ellipse class="liquid" cx="100" cy="175" rx="54" ry="18" />
+    <rect class="liquid" x="46" y="175" width="108" height="72" rx="0" />
+    <g fill="#64748b">
+      <ellipse cx="88" cy="245" rx="26" ry="12" />
+      <ellipse cx="115" cy="250" rx="20" ry="10" />
+      <ellipse cx="100" cy="233" rx="18" ry="9" />
+    </g>
+    <text x="92" y="330" text-anchor="middle" class="mark">A</text>
+    <text x="-10" y="182" class="small">H2O</text>
+    <path class="arrow" d="M10 175 L55 175" />
+    <text x="-8" y="250" class="small">Phenol</text>
+    <path class="arrow" d="M45 242 L70 242" />
+  </g>
+
+  <path class="arrow" d="M300 220 L380 220" />
+
+  <g transform="translate(390,80)">
+    <path class="tube" d="M40 10 L40 240 Q40 275 75 285 L125 285 Q160 275 160 240 L160 10" />
+    <ellipse class="liquid" cx="100" cy="175" rx="54" ry="16" />
+    <rect class="liquid" x="46" y="175" width="108" height="72" rx="0" />
+    <text x="92" y="330" text-anchor="middle" class="mark">B</text>
+    <text x="48" y="-18" class="small">NaOH</text>
+    <path class="arrow" d="M82 -6 C115 5 140 25 145 60" />
+  </g>
+
+  <path class="arrow" d="M600 220 L680 220" />
+
+  <g transform="translate(690,40)">
+    <path class="tube" d="M40 50 L40 280 Q40 315 75 325 L125 325 Q160 315 160 280 L160 50" />
+    <ellipse class="liquid" cx="100" cy="215" rx="54" ry="18" />
+    <rect class="liquid" x="46" y="215" width="108" height="72" rx="0" />
+    <g>
+      <circle class="bubble" cx="88" cy="268" r="4" />
+      <circle class="bubble" cx="110" cy="250" r="4" />
+      <circle class="bubble" cx="123" cy="232" r="4" />
+      <circle class="bubble" cx="80" cy="236" r="4" />
+      <circle class="bubble" cx="98" cy="220" r="4" />
+      <circle class="bubble" cx="120" cy="275" r="4" />
+    </g>
+    <path class="tube" d="M120 0 L210 0 L210 190" />
+    <path class="tube" d="M120 190 L120 255" />
+    <text x="152" y="-14" class="small">CO2</text>
+    <path class="arrow" d="M175 -2 L245 -2" />
+    <text x="92" y="370" text-anchor="middle" class="mark">C</text>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+Dựa vào cấu trúc thư mục của dự án TRO_CHOI_DUNG_SAI, dưới đây là tổng hợp các chức năng chính của ứng dụng và tác dụng của từng chức năng:
+
+### 1. Hệ thống Trò chơi & Huấn luyện Luyện tập (src/pages, src/components)
+* Games Hub (GamesHubPage): Trung tâm trò chơi, nơi tổng hợp các minigame và chế độ chơi khác nhau để học sinh lựa chọn.
+* Direct/Indirect Games (DirectGamesPage, IndirectGamesPage): Phân loại các trò chơi tương tác trực tiếp (thi đấu thời gian thực) và gián tiếp (chơi offline/theo lượt).
+* Đấu trường Học thuật (AcademicArenaPage / LiveBattle): Chế độ thi đấu (Live Battle) đa môn, cho phép học sinh thi đấu trực tiếp với nhau.
+* Chạy vô tận (EndlessRunPage): Chế độ trả lời câu hỏi liên tục không giới hạn để kiểm tra sức bền và giới hạn kiến thức.
+* Luyện tập loại trừ (EliminationTrainerPage): Chế độ huấn luyện giúp người chơi rèn luyện kỹ năng loại trừ đáp án sai.
+* Hộp mù / Gacha (BlindBoxPage): Chức năng mở hộp phần thưởng (như thẻ bài hoặc vật phẩm) để tăng tính giải trí và động lực học tập.
+
+### 2. Hệ thống Theo dõi & Cạnh tranh (src/pages)
+* Nhiệm vụ hàng ngày (DailyMissionPage): Cung cấp các mục tiêu học tập mỗi ngày để duy trì thói quen học tập.
+* Bảng xếp hạng (LeaderboardPage): Hiển thị điểm số và thứ hạng của người chơi, tạo tính cạnh tranh.
+* Bộ sưu tập (CollectionPage): Nơi lưu trữ vật phẩm, thẻ bài hoặc các thành tựu mà học sinh đã thu thập được trong quá trình chơi.
+* Sổ Lỗi (ErrorBookPage): Lưu trữ và tự động tổng hợp những câu hỏi học sinh đã làm sai để ôn tập lại, giúp khắc phục lỗ hổng kiến thức.
+
+### 3. Hệ thống Ai & Quản lý dữ liệu (src/lib, api/, server/)
+* Trí tuệ Nhân tạo (AI Question Generator & AI Solve Service): Tự động khởi tạo câu hỏi phát sinh theo ngữ cảnh hoặc giải thích đáp án bằng AI (aiQuestionGenerator.ts, solve-question.ts).
+* Tìm kiếm tích hợp (google-search.js, curated-search.js): Tra cứu thông tin tức thời và lấy dữ liệu để hỗ trợ tạo hoặc giải đáp câu hỏi.
+* Ngân hàng câu hỏi (questionBank.ts, hooks/useQuestionBank.ts): Quản lý và cung cấp ngẫu nhiên hoặc có theo quy luật các câu hỏi lên giao diện.
+
+### 4. Hệ thống Tài khoản & Lớp học
+* Dashboard / Admin Dashboard: Dành cho giáo viên/quản trị viên theo dõi tiến trình của học sinh, quản lý câu hỏi và hệ thống.
+* Lớp học & Cấu hình người dùng (classroom.ts, userProfiles.ts): Quản lý lớp học, phân quyền và lưu trữ dữ liệu tài khoản trên Firebase. 
+* Quét mã & Chấm điểm thông minh: Chứa module PHIEUTRALOITRACNGHIEMTHONGMINH hỗ trợ chấm điểm kỳ thi dựa trên phiếu trả lời.

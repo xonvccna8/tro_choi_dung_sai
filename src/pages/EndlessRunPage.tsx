@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChemText } from "../components/ChemText";
 import { GameShell } from "../components/GameShell";
-import { trueFalseQuestions } from "../data/questions";
+import { QuestionBankNotice } from "../components/QuestionBankNotice";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import { filterTrueFalseQuestionsByMode } from "../lib/questionBank";
 import { useGameStore } from "../store/useGameStore";
 import { playCorrect, playWrong } from "../utils/sound";
 
@@ -10,15 +12,59 @@ export function EndlessRunPage() {
   const addGold = useGameStore((s) => s.addGold);
   const addExp = useGameStore((s) => s.addExp);
   const soundOn = useGameStore((s) => s.soundOn);
-  const customTrueFalseQuestions = useGameStore((s) => s.customTrueFalseQuestions);
+  const { questions, loading, error, isConfigured } = useQuestionBank();
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [lane, setLane] = useState<"left" | "right">("right");
   const [resultMessage, setResultMessage] = useState("");
-  const list = useMemo(
-    () => [...customTrueFalseQuestions, ...trueFalseQuestions, ...customTrueFalseQuestions, ...trueFalseQuestions],
-    [customTrueFalseQuestions],
-  );
+  const list = useMemo(() => {
+    const baseQuestions = filterTrueFalseQuestionsByMode(questions, "run");
+    return baseQuestions.length > 0 ? [...baseQuestions, ...baseQuestions] : [];
+  }, [questions]);
+
+  if (!isConfigured) {
+    return (
+      <GameShell title="Đường Chạy Vô Cực" subtitle="Trái = Sai, Phải = Đúng">
+        <QuestionBankNotice
+          title="Firebase chưa sẵn sàng"
+          description="Game này đã chuyển sang dùng ngân hàng câu hỏi Firebase. Hãy cấu hình Firebase rồi tạo câu hỏi Đúng/Sai đơn cho Đường Chạy Vô Cực."
+          tone="amber"
+        />
+      </GameShell>
+    );
+  }
+
+  if (loading) {
+    return (
+      <GameShell title="Đường Chạy Vô Cực" subtitle="Trái = Sai, Phải = Đúng">
+        <QuestionBankNotice
+          title="Đang đồng bộ câu hỏi"
+          description="Hệ thống đang tải câu hỏi từ Firebase cho Đường Chạy Vô Cực."
+          hideAction
+        />
+      </GameShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <GameShell title="Đường Chạy Vô Cực" subtitle="Trái = Sai, Phải = Đúng">
+        <QuestionBankNotice title="Không tải được câu hỏi" description={error} tone="rose" />
+      </GameShell>
+    );
+  }
+
+  if (list.length === 0) {
+    return (
+      <GameShell title="Đường Chạy Vô Cực" subtitle="Trái = Sai, Phải = Đúng">
+        <QuestionBankNotice
+          title="Chưa có câu hỏi cho Đường Chạy Vô Cực"
+          description="Hãy tạo ít nhất 1 câu Đúng/Sai đơn và gắn nó cho game Đường Chạy Vô Cực trong trình tạo câu hỏi."
+        />
+      </GameShell>
+    );
+  }
+
   const q = list[index % list.length];
 
   const choose = (value: boolean) => {

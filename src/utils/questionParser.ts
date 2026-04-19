@@ -61,7 +61,7 @@ export function parseQuestionFile(content: string): ParsedResult {
       i++; // skip closing ---
 
       if (block.length >= 5) {
-        const question = block[0];
+        const stemLines: string[] = [block[0]];
         const statements: { label: string; text: string; correct: boolean }[] = [];
         let explanation = "";
 
@@ -84,12 +84,17 @@ export function parseQuestionFile(content: string): ParsedResult {
           const expMatch = bline.match(/^(Giai thich|Giải thích|GIAI THICH|GT):\s*(.+)/i);
           if (expMatch) {
             explanation = expMatch[2].trim();
+            continue;
+          }
+
+          if (statements.length === 0 && bline.trim()) {
+            stemLines.push(bline.trim());
           }
         }
 
         if (statements.length === 4) {
           result.multiTrueFalse.push({
-            question,
+            question: stemLines.join("\n"),
             statements,
             explanation: explanation || "Giao vien chua them giai thich.",
           });

@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChemText } from "../components/ChemText";
+import { RichContentBlock } from "../components/RichContent";
 import { GameShell } from "../components/GameShell";
 import { ConfettiRain, StarBlast } from "../components/Effects";
-import { round1Pool, round2Pool, round3Pool } from "../data/arenaQuestions";
+import { QuestionBankNotice } from "../components/QuestionBankNotice";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import { filterMultiTrueFalseQuestionsByMode } from "../lib/questionBank";
 import { useGameStore } from "../store/useGameStore";
 import { calcRealScore, scoreLabel } from "../types";
 import type { ExamResult, ErrorRecord, MultiTrueFalseQuestion } from "../types";
@@ -11,9 +14,9 @@ import { playCorrect, playReward, playWrong } from "../utils/sound";
 
 /* ── Cấu hình 3 vòng thi ── */
 const ROUND_CONFIG = [
-  { name: "Khởi Động", icon: "🔥", questions: 4, time: 5 * 60, pool: round1Pool, color: "from-emerald-500 to-teal-500", bgGlow: "shadow-emerald-500/30" },
-  { name: "Tăng Tốc", icon: "⚡", questions: 4, time: 5 * 60, pool: round2Pool, color: "from-amber-500 to-orange-500", bgGlow: "shadow-amber-500/30" },
-  { name: "Quyết Chiến", icon: "👑", questions: 2, time: 3 * 60, pool: round3Pool, color: "from-rose-500 to-pink-500", bgGlow: "shadow-rose-500/30" },
+  { name: "Khởi Động", icon: "🔥", questions: 4, time: 5 * 60, arenaRound: 1 as const, color: "from-emerald-500 to-teal-500", bgGlow: "shadow-emerald-500/30" },
+  { name: "Tăng Tốc", icon: "⚡", questions: 4, time: 5 * 60, arenaRound: 2 as const, color: "from-amber-500 to-orange-500", bgGlow: "shadow-amber-500/30" },
+  { name: "Quyết Chiến", icon: "👑", questions: 2, time: 3 * 60, arenaRound: 3 as const, color: "from-rose-500 to-pink-500", bgGlow: "shadow-rose-500/30" },
 ];
 
 const TOTAL_MAX = 10; // 4+4+2=10 điểm
@@ -45,8 +48,21 @@ type RoundResult = {
   timeSpent: number;
 };
 
-export function ChemArenaPage() {
+export function AcademicArenaPage() {
   const { addGold, addExp, addExamResult, addErrors, addPerfect, soundOn } = useGameStore();
+  const { questions: bankQuestions, loading, error, isConfigured } = useQuestionBank();
+  const arenaPools = useMemo(
+    () => ({
+      1: filterMultiTrueFalseQuestionsByMode(bankQuestions, "arena", 1),
+      2: filterMultiTrueFalseQuestionsByMode(bankQuestions, "arena", 2),
+      3: filterMultiTrueFalseQuestionsByMode(bankQuestions, "arena", 3),
+    }),
+    [bankQuestions],
+  );
+  const hasEnoughArenaQuestions =
+    arenaPools[1].length >= ROUND_CONFIG[0].questions &&
+    arenaPools[2].length >= ROUND_CONFIG[1].questions &&
+    arenaPools[3].length >= ROUND_CONFIG[2].questions;
 
   const [phase, setPhase] = useState<Phase>("menu");
   const [currentRound, setCurrentRound] = useState(0);
@@ -104,7 +120,7 @@ export function ChemArenaPage() {
   /* ── Begin playing a round ── */
   const beginRound = () => {
     const cfg = ROUND_CONFIG[currentRound];
-    const qs = shuffle(cfg.pool).slice(0, cfg.questions);
+    const qs = shuffle(arenaPools[cfg.arenaRound]).slice(0, cfg.questions);
     setQuestions(qs);
     setAnswers({});
     setTimeLeft(cfg.time);
@@ -178,6 +194,49 @@ export function ChemArenaPage() {
     setPhase("round-result");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!isConfigured) {
+    return (
+      <GameShell title="⚔️ Đấu Trường Hóa Học" subtitle="3 vòng – 10 câu – 10 điểm – Luyện như thi thật!">
+        <QuestionBankNotice
+          title="Firebase chưa sẵn sàng"
+          description="Đấu Trường Hóa Học đã chuyển sang dùng câu hỏi 4 ý theo vòng từ Firebase. Hãy cấu hình Firebase rồi tạo câu hỏi cho từng vòng đấu."
+          tone="amber"
+        />
+      </GameShell>
+    );
+  }
+
+  if (loading) {
+    return (
+      <GameShell title="⚔️ Đấu Trường Hóa Học" subtitle="3 vòng – 10 câu – 10 điểm – Luyện như thi thật!">
+        <QuestionBankNotice
+          title="Đang đồng bộ câu hỏi"
+          description="Hệ thống đang tải ngân hàng câu hỏi Đấu Trường từ Firebase."
+          hideAction
+        />
+      </GameShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <GameShell title="⚔️ Đấu Trường Hóa Học" subtitle="3 vòng – 10 câu – 10 điểm – Luyện như thi thật!">
+        <QuestionBankNotice title="Không tải được câu hỏi" description={error} tone="rose" />
+      </GameShell>
+    );
+  }
+
+  if (!hasEnoughArenaQuestions) {
+    return (
+      <GameShell title="⚔️ Đấu Trường Hóa Học" subtitle="3 vòng – 10 câu – 10 điểm – Luyện như thi thật!">
+        <QuestionBankNotice
+          title="Chưa đủ câu hỏi cho Đấu Trường"
+          description={`Đấu Trường cần tối thiểu 4 câu cho Vòng 1, 4 câu cho Vòng 2 và 2 câu cho Vòng 3. Hiện tại đang có ${arenaPools[1].length} / ${arenaPools[2].length} / ${arenaPools[3].length} câu.`}
+        />
+      </GameShell>
+    );
+  }
 
   /* ── Next round or final ── */
   const nextRound = () => {
@@ -399,9 +458,10 @@ export function ChemArenaPage() {
                     </span>
                   </div>
 
-                  <p className="text-base font-bold text-slate-800">
-                    <ChemText text={questions[currentQ].question} />
-                  </p>
+                  <RichContentBlock
+                    text={questions[currentQ].question}
+                    className="text-base font-bold text-slate-800"
+                  />
 
                   {questions[currentQ].statements.map((s) => {
                     const qId = questions[currentQ].id;
@@ -522,7 +582,7 @@ export function ChemArenaPage() {
                             {scoreLabel(cc)}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm font-medium"><ChemText text={q.question} /></p>
+                        <RichContentBlock text={q.question} className="mt-1 text-sm font-medium text-slate-800" />
                         {q.statements.map((s) => {
                           const userAns = a[s.id];
                           const isCorrectAns = userAns === s.correct;

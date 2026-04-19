@@ -6,6 +6,25 @@ export type TrueFalseQuestion = {
   explanation: string;
 };
 
+export type AppUserRole = "admin" | "teacher" | "student";
+
+export type AppUser = {
+  id: string;
+  name: string;
+  avatar: string;
+  role: AppUserRole;
+  teacherId?: string | null;
+};
+
+export type QuestionGameMode = "pirate" | "run" | "blind-box" | "elimination" | "arena";
+
+export type ArenaRound = 1 | 2 | 3;
+
+export type QuestionAssignment = {
+  gameModes: QuestionGameMode[];
+  arenaRound: ArenaRound | null;
+};
+
 export type MultiTrueFalseStatement = {
   id: string;
   label: "a." | "b." | "c." | "d.";
@@ -20,6 +39,27 @@ export type MultiTrueFalseQuestion = {
   statements: MultiTrueFalseStatement[];
   explanation: string;
 };
+
+export type QuestionLibraryMeta = {
+  gradeLevel?: "10" | "11" | "12" | "other" | null;
+  subject?: string | null;
+  chapter?: string | null;
+  lesson?: string | null;
+};
+
+export type SyncedQuestionMeta = QuestionAssignment & QuestionLibraryMeta & {
+  createdAt?: string;
+  updatedAt?: string;
+  createdByUid?: string | null;
+  createdByName?: string | null;
+  createdByRole?: AppUserRole | null;
+};
+
+export type SyncedTrueFalseQuestion = TrueFalseQuestion & SyncedQuestionMeta;
+
+export type SyncedMultiTrueFalseQuestion = MultiTrueFalseQuestion & SyncedQuestionMeta;
+
+export type SyncedQuestion = SyncedTrueFalseQuestion | SyncedMultiTrueFalseQuestion;
 
 export type Student = {
   id: string;

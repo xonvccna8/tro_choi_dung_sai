@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
 import { ChemText } from "../components/ChemText";
+import { RichContentBlock } from "../components/RichContent";
 import { GameShell } from "../components/GameShell";
 import { StarBlast } from "../components/Effects";
-import { multiTrueFalseQuestions } from "../data/questions";
+import { QuestionBankNotice } from "../components/QuestionBankNotice";
+import { useQuestionBank } from "../hooks/useQuestionBank";
+import { filterMultiTrueFalseQuestionsByMode } from "../lib/questionBank";
 import { useGameStore } from "../store/useGameStore";
 import { calcRealScore, scoreLabel } from "../types";
 import type { ErrorRecord } from "../types";
@@ -12,11 +15,9 @@ type Confidence = "sure" | "unsure" | "none";
 type Phase = "mark" | "focus" | "result";
 
 export function EliminationTrainerPage() {
-  const { addGold, addExp, addErrors, addPerfect, soundOn, customMultiTrueFalseQuestions } = useGameStore();
-  const pool = useMemo(
-    () => [...customMultiTrueFalseQuestions, ...multiTrueFalseQuestions],
-    [customMultiTrueFalseQuestions],
-  );
+  const { addGold, addExp, addErrors, addPerfect, soundOn } = useGameStore();
+  const { questions, loading, error, isConfigured } = useQuestionBank();
+  const pool = useMemo(() => filterMultiTrueFalseQuestionsByMode(questions, "elimination"), [questions]);
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("mark");
   const [confidence, setConfidence] = useState<Record<string, Confidence>>({});
@@ -25,6 +26,49 @@ export function EliminationTrainerPage() {
   const [message, setMessage] = useState("");
   const [totalScore, setTotalScore] = useState(0);
   const [totalQ, setTotalQ] = useState(0);
+
+  if (!isConfigured) {
+    return (
+      <GameShell title="🥷 Thợ Săn Loại Trừ" subtitle="Tuyệt kỹ nhẫn giả: Phân biệt Thực - Hư">
+        <QuestionBankNotice
+          title="Firebase chưa sẵn sàng"
+          description="Game này đã chuyển sang dùng câu hỏi 4 ý từ Firebase. Hãy cấu hình Firebase rồi tạo câu hỏi cho Thợ Săn Loại Trừ."
+          tone="amber"
+        />
+      </GameShell>
+    );
+  }
+
+  if (loading) {
+    return (
+      <GameShell title="🥷 Thợ Săn Loại Trừ" subtitle="Tuyệt kỹ nhẫn giả: Phân biệt Thực - Hư">
+        <QuestionBankNotice
+          title="Đang đồng bộ câu hỏi"
+          description="Hệ thống đang tải câu hỏi cho Thợ Săn Loại Trừ từ Firebase."
+          hideAction
+        />
+      </GameShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <GameShell title="🥷 Thợ Săn Loại Trừ" subtitle="Tuyệt kỹ nhẫn giả: Phân biệt Thực - Hư">
+        <QuestionBankNotice title="Không tải được câu hỏi" description={error} tone="rose" />
+      </GameShell>
+    );
+  }
+
+  if (pool.length === 0) {
+    return (
+      <GameShell title="🥷 Thợ Săn Loại Trừ" subtitle="Tuyệt kỹ nhẫn giả: Phân biệt Thực - Hư">
+        <QuestionBankNotice
+          title="Chưa có câu hỏi cho Thợ Săn Loại Trừ"
+          description="Hãy tạo ít nhất 1 câu 4 ý và gắn nó cho game Thợ Săn Loại Trừ trong trình tạo câu hỏi."
+        />
+      </GameShell>
+    );
+  }
 
   const q = pool[index % pool.length];
 
@@ -135,9 +179,7 @@ export function EliminationTrainerPage() {
           </p>
         </div>
 
-        <p className="font-medium">
-          <ChemText text={q.question} />
-        </p>
+        <RichContentBlock text={q.question} className="font-medium text-slate-800" />
 
         {/* PHASE: MARK */}
         {phase === "mark" && (
