@@ -7,7 +7,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, hasFirebaseConfig } from "./firebase";
 
 type TeacherClassDocument = {
   name?: string;
@@ -80,6 +80,14 @@ function createInviteCode() {
 }
 
 export async function listTeacherClasses(teacherId: string): Promise<TeacherClass[]> {
+  if (!hasFirebaseConfig) {
+    if (teacherId !== "demo-ntmb" && teacherId !== "demo-nvxo") return [];
+    return [
+      { id: "class-1", name: "12A1 (Nhóm 1)", teacherId: "demo-ntmb", teacherName: "NGUYỄN THỊ MỸ BÌNH", inviteCode: "12A1XM", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" },
+      { id: "class-2", name: "12A2 (Nhóm 2)", teacherId: "demo-ntmb", teacherName: "NGUYỄN THỊ MỸ BÌNH", inviteCode: "12A2YM", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" }
+    ];
+  }
+
   const database = ensureDb();
   const snapshot = await getDocs(query(collection(database, "classes"), where("teacherId", "==", teacherId)));
 
@@ -100,6 +108,27 @@ export async function listTeacherClasses(teacherId: string): Promise<TeacherClas
 }
 
 export async function listStudents(): Promise<ClassroomStudent[]> {
+  if (!hasFirebaseConfig) {
+    const names = [
+      "Huỳnh Thái An", "Phạm Đình Bảo Anh", "Tống Ngọc Hải Âu", "Nguyễn Trọng Đạt", "Nguyễn Quang Đạt",
+      "Nguyễn Anh Đức", "Nguyễn Trung Dũng", "Trần Minh Hoàng", "Nguyễn Văn Huy", "Nguyễn Dũng Kiên",
+      "Vũ Tuấn Kiệt", "Hoàng Khánh Ly", "Trần Trà My", "Nguyễn Văn Hoàng Sâm", "Nguyễn Văn Sơn",
+      "Lưu Đình Tài", "Nguyễn Hữu Tuấn", "Phan Bá Tùng", "Nguyễn Long Khánh", "Nguyễn Bá Trường",
+      "Nguyễn Thị Quỳnh Chi", "Nguyễn Trần Đăng", "Trịnh Đức Duy", "Thái Văn Duy", "Lê Chu Tuấn Duy",
+      "Lê Huy Hoàng", "Nguyễn Thị Thanh Huyền", "Chương Tấn Sang", "Nguyễn Thị Thảo Sương", "Nguyễn Thị Hà Thủy",
+      "Nguyễn Thị Huyền Trang", "Nguyễn Thị Cẩm Tú", "Nguyễn Hoàng Tuấn", "Hà Thảo Uyên", "Lê Thị Bảo Hà"
+    ];
+    return names.map((name, i) => ({
+      id: `demo-${i+1}`,
+      email: `hs${String(i+1).padStart(6, '0')}@gmail.com`,
+      name: name,
+      avatar: "👨‍🎓",
+      classId: i < 17 ? "class-1" : "class-2",
+      className: i < 17 ? "12A1 (Nhóm 1)" : "12A2 (Nhóm 2)",
+      teacherId: "demo-ntmb"
+    }));
+  }
+
   const database = ensureDb();
   const snapshot = await getDocs(collection(database, "users"));
 
