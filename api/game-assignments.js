@@ -1,5 +1,7 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import fs from "fs";
+import path from "path";
 
 const COLLECTION = "gameAssignments";
 const validRoles = new Set(["admin", "teacher", "student"]);
@@ -46,4 +48,41 @@ async function list(req, res) { const db = getAdminDb(); const teacherId = typeo
 async function create(req, res) { const db = getAdminDb(); const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {}; const actor = normalizeUser(body.user); const input = normalizeInput(body.assignment); const ref = db.collection(COLLECTION).doc(); const timestamp = FieldValue.serverTimestamp(); await ref.set({ ...input, createdAt: timestamp, updatedAt: timestamp, createdByUid: actor?.id ?? null, createdByName: actor?.name ?? null, createdByRole: actor?.role ?? null }); sendJson(res, 200, { ok: true, id: ref.id }); }
 async function update(req, res) { const db = getAdminDb(); const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {}; const id = typeof body.id === "string" ? body.id.trim() : ""; if (!id) throw new Error("Thiếu id giao trò chơi."); const input = normalizeInput(body.assignment); const ref = db.collection(COLLECTION).doc(id); const snap = await ref.get(); if (!snap.exists) return sendJson(res, 404, { ok: false, error: "Không tìm thấy." }); await ref.update({ ...input, updatedAt: FieldValue.serverTimestamp() }); sendJson(res, 200, { ok: true, id }); }
 async function remove(req, res) { const db = getAdminDb(); const id = typeof req.query.id === "string" ? req.query.id.trim() : ""; if (!id) return sendJson(res, 400, { ok: false, error: "Thiếu id." }); const ref = db.collection(COLLECTION).doc(id); const snap = await ref.get(); if (!snap.exists) return sendJson(res, 404, { ok: false, error: "Không tìm thấy." }); await ref.delete(); sendJson(res, 200, { ok: true, id }); }
-export default async function handler(req, res) { try { if (req.method === "GET") { if (req.query?.id) return await getById(req, res); return await list(req, res); } if (req.method === "POST") return await create(req, res); if (req.method === "PUT") return await update(req, res); if (req.method === "DELETE") return await remove(req, res); sendJson(res, 405, { ok: false, error: "Method không được hỗ trợ." }); } catch (error) { const message = error instanceof Error ? error.message : "Lỗi không xác định."; sendJson(res, message.includes("Firebase Admin chưa được cấu hình đầy đủ") ? 503 : 500, { ok: false, error: message }); } }
+
+export default async function handler(req, res) { 
+  try { 
+    if (req.method === "GET") { 
+      if (req.query?.id) return await getById(req, res); 
+      return await list(req, res); 
+    } 
+    if (req.method === "POST") return await create(req, res); 
+    if (req.method === "PUT") return await update(req, res); 
+    if (req.method === "DELETE") return await remove(req, res); 
+    sendJson(res, 405, { ok: false, error: "Method không được hỗ trợ." }); 
+  } catch (error) { 
+    const message = error instanceof Error ? error.message : "Lỗi không xác định."; 
+    const isConfigError = message.includes("Firebase Admin chưa được cấu hình đầy đủ");
+    
+    if (isConfigError && req.method === "GET") {
+      try {
+        const mockRaw = fs.readFileSync(path.join(process.cwd(), "api/mock_db.json"), "utf8");
+        const dbJson = JSON.parse(mockRaw);
+        
+        if (req.query?.id) {
+          const found = dbJson.gameAssignments?.find(a => a.id === req.query.id);
+          if (found) return sendJson(res, 200, { ok: true, assignment: found });
+          return sendJson(res, 404, { ok: false, error: "Không tìm thấy trong mock." });
+        }
+        
+        const teacherId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : "";
+        let listArr = dbJson.gameAssignments || [];
+        if (teacherId) listArr = listArr.filter(a => a.createdByUid === teacherId);
+        
+        listArr.sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+        return sendJson(res, 200, { ok: true, assignments: listArr });
+      } catch(e) {}
+    }
+
+    sendJson(res, isConfigError ? 503 : 500, { ok: false, error: message }); 
+  } 
+}

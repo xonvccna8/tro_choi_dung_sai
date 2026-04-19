@@ -1,0 +1,21 @@
+🌟 TÓM TẮT 4 BƯỚC SỬ DỤNG DÀNH CHO GIÁO VIÊN
+
+1. Tạo Lớp Học (Menu Lớp Học)
+- Nhấn [+ Thêm Lớp Mới] (VD: Lớp 12A1).
+- Copy Mã Lớp gửi cho Học sinh để các em nhập mã lúc đăng nhập.
+
+2. Xây Dựng Ngân Hàng Câu Hỏi (Menu Tạo Câu Mới)
+- Chọn soạn câu hỏi dạng Đúng/Sai hoặc 4 Ý Mệnh Đề.
+- Nhập đề bài, chọn đáp án đúng, thêm lời giải (nếu muốn) và lưu vào Thư Viện.
+
+3. Giao Bài Tập & Trò Chơi (Menu Đề Thi / Bài Giao)
+Từ Thư Viện đã tạo ở Bước 2, có 2 cách để dùng:
+- Tạo Đề Thi Khô: Ghép các câu hỏi thành 1 đề -> Nhấn Xuất file Word để in ra giấy.
+- Giao Trò Chơi: Chọn học sinh/lớp -> Chọn thể loại Game (Đường chạy, Hải tặc, Hộp bí ẩn, Loại trừ, Đấu trường) -> Bấm Giao Game để học sinh làm Online ở nhà.
+
+4. Theo Dõi Kết Quả (Menu Thống Kê)
+- Xem biểu đồ điểm, top những học sinh cày game nhiều nhất.
+- Kiểm tra tỉ lệ học sinh trả lời sai từng câu để lên lớp sửa bài tập trung.
+
+---
+💡 Típ xài nhanh: Đăng nhập bằng ntmb@gmail.com (Pass: 123456) -> Tự tạo 1 lớp -> Tạo 5 câu hỏi -> Giao game "Đảo hải tặc" -> Đăng nhập sang tài khoản tài khoản Học Sinh (chọn 1 tài khoản bạn đã có) để tự chơi thử là sẽ "nắm trọn" cả hệ thống trong 5 phút!

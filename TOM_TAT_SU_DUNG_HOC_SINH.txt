@@ -1,0 +1,19 @@
+🌟 TÓM TẮT 4 BƯỚC SỬ DỤNG DÀNH CHO HỌC SINH
+
+1. Đăng Nhập / Tạo Tài Khoản
+- Login tài khoản thực của trường hoặc tự nhập tài khoản trải nghiệm có sẵn.
+- Trải nghiệm nhanh: Từ hs000001@gmail.com (pass: 000001) đến hs000035@gmail.com (pass: 000035).
+
+2. Nhập Mã Lớp Của Giáo Viên
+- Xin giáo viên Mã Lớp Học (Class ID).
+- Dán mã này vào mục "Gia nhập Lớp" ở màn hình chính để nối server lấy Bài tập từ thầy cô.
+
+3. Chuyên Mục Cày Game Lấy Điểm
+- Chuyển sang thẻ "Trung tâm Trò Chơi".
+- Các bài tập trắc nghiệm sẽ hóa thân thành Game. Bấm vào Nhiệm Vụ Mới để chiến các mode (Đường chạy/Hải tặc/Hộp bí ẩn/Loại trừ). Cố gắng phản xạ nhanh, trả lời ĐÚNG/SAI để tích thật nhiều điểm XP, thăng hạng Leaderboard!
+
+4. Ôn Lại Lỗ Hổng Kiến Thức (Sổ Tay Lỗi)
+- Đừng sợ sai! Mọi câu sai sẽ được phân loại vào "Sổ Tay Lỗi".
+- Sau khi game over, hãy vào sổ tay đọc lại "Lời giải chi tiết" và luyện tập lại để phục thù ván sau.
+
+🎮 Chúc bạn "Leo rank Hóa Học" thật bùng nổ!

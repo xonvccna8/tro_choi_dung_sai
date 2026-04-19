@@ -1,5 +1,7 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import fs from "fs";
+import path from "path";
 
 const COLLECTION = "gameResults";
 const validRoles = new Set(["admin", "teacher", "student"]);
@@ -44,4 +46,28 @@ function mapDoc(docSnap) {
 
 async function list(req, res) { const db = getAdminDb(); const assignmentId = typeof req.query.assignmentId === "string" ? req.query.assignmentId.trim() : ""; let q = db.collection(COLLECTION); if (assignmentId) q = q.where("assignmentId", "==", assignmentId); const snap = await q.get(); sendJson(res, 200, { ok: true, results: snap.docs.map(mapDoc).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? "")) }); }
 async function create(req, res) { const db = getAdminDb(); const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body ?? {}; const actor = normalizeUser(body.user); const input = normalizeInput(body.result); const ref = db.collection(COLLECTION).doc(); const timestamp = FieldValue.serverTimestamp(); await ref.set({ ...input, createdAt: timestamp, createdByUid: actor?.id ?? null, createdByName: actor?.name ?? null, createdByRole: actor?.role ?? null }); sendJson(res, 200, { ok: true, id: ref.id }); }
-export default async function handler(req, res) { try { if (req.method === "GET") return await list(req, res); if (req.method === "POST") return await create(req, res); sendJson(res, 405, { ok: false, error: "Method không được hỗ trợ." }); } catch (error) { const message = error instanceof Error ? error.message : "Lỗi không xác định."; sendJson(res, message.includes("Firebase Admin chưa được cấu hình đầy đủ") ? 503 : 500, { ok: false, error: message }); } }
+
+export default async function handler(req, res) { 
+  try { 
+    if (req.method === "GET") return await list(req, res); 
+    if (req.method === "POST") return await create(req, res); 
+    sendJson(res, 405, { ok: false, error: "Method không được hỗ trợ." }); 
+  } catch (error) { 
+    const message = error instanceof Error ? error.message : "Lỗi không xác định."; 
+    const isConfigError = message.includes("Firebase Admin chưa được cấu hình đầy đủ");
+    
+    if (isConfigError && req.method === "GET") {
+      try {
+        const mockRaw = fs.readFileSync(path.join(process.cwd(), "api/mock_db.json"), "utf8");
+        const dbJson = JSON.parse(mockRaw);
+        const reqAssignmentId = typeof req.query.assignmentId === "string" ? req.query.assignmentId.trim() : "";
+        let results = dbJson.gameResults || [];
+        if (reqAssignmentId) results = results.filter(r => r.assignmentId === reqAssignmentId);
+        results.sort((a, b) => (b.playedAt ?? "").localeCompare(a.playedAt ?? ""));
+        return sendJson(res, 200, { ok: true, results });
+      } catch (e) {}
+    }
+    
+    sendJson(res, isConfigError ? 503 : 500, { ok: false, error: message }); 
+  } 
+}

@@ -1,5 +1,7 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import fs from "fs";
+import path from "path";
 
 const QUESTIONS_COLLECTION = "questions";
 const validRoles = new Set(["admin", "teacher", "student"]);
@@ -267,6 +269,22 @@ export default async function handler(req, res) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Lỗi không xác định từ Firebase Admin.";
     const isConfigError = message.includes("Firebase Admin chưa được cấu hình đầy đủ");
+    
+    if (isConfigError && req.method === "GET") {
+      try {
+        const mockDataPath = path.join(process.cwd(), "api/mock_db.json");
+        if (fs.existsSync(mockDataPath)) {
+          const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
+          const dbData = JSON.parse(dbRaw);
+          // Cho frontend biết cấu hình true để không hiện đỏ
+          sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
+          return;
+        }
+      } catch (e) {
+        console.error("Lỗi đọc Mock DB:", e);
+      }
+    }
+
     sendJson(res, isConfigError ? 503 : 500, {
       configured: !isConfigError,
       error: message,
