@@ -36,7 +36,29 @@ export type ParsedResult = {
  *   Giai thich: Noi dung giai thich.
  *   ---
  */
-export function parseQuestionFile(content: string): ParsedResult {
+/**
+ * Normalize text extracted by mammoth - fix common encoding issues with Vietnamese
+ * Also normalize [ĐÚNG]/[DUNG] variants to a canonical form
+ */
+function normalizeText(text: string): string {
+  return text
+    // Normalize Unicode to NFC (composed form)
+    .normalize("NFC")
+    // Common mammoth encoding artifacts for Vietnamese
+    .replace(/\[ÄÃ NG\]/gi, "[ĐÚNG]")
+    .replace(/\[ÄÃng\]/gi, "[ĐÚNG]")
+    .replace(/\[DUNG\]/gi, "[ĐÚNG]")
+    .replace(/\[Dung\]/gi, "[ĐÚNG]")
+    .replace(/\[dung\]/gi, "[ĐÚNG]")
+    .replace(/\[Đúng\]/gi, "[ĐÚNG]")
+    .replace(/\[đúng\]/gi, "[ĐÚNG]")
+    .replace(/\[SAI\]/gi, "[SAI]")
+    .replace(/\[Sai\]/gi, "[SAI]")
+    .replace(/\[sai\]/gi, "[SAI]");
+}
+
+export function parseQuestionFile(rawContent: string): ParsedResult {
+  const content = normalizeText(rawContent);
   const lines = content.split("\n").map((l) => l.trim());
   const result: ParsedResult = { trueFalse: [], multiTrueFalse: [] };
 
@@ -67,15 +89,16 @@ export function parseQuestionFile(content: string): ParsedResult {
 
         for (const bline of block.slice(1)) {
           // Match: a. [DUNG] text  or  a. [SAI] text  (case insensitive, Vietnamese accents)
+          // After normalizeText, only [ĐÚNG] and [SAI] remain
           const stmtMatch = bline.match(
-            /^([a-d])\.\s*\[(DUNG|SAI|ĐÚNG|Đúng|đúng|sai|Sai)\]\s*(.+)/i,
+            /^([a-d])\s*\.\s*\[(ĐÚNG|SAI)\]\s*(.+)/i,
           );
           if (stmtMatch) {
             const correctVal = stmtMatch[2].toUpperCase();
             statements.push({
               label: stmtMatch[1] + ".",
               text: stmtMatch[3].trim(),
-              correct: correctVal === "DUNG" || correctVal === "ĐÚNG",
+              correct: correctVal === "ĐÚNG",
             });
             continue;
           }
@@ -104,12 +127,13 @@ export function parseQuestionFile(content: string): ParsedResult {
     }
 
     // ── Single true-false: [DUNG] or [SAI] statement | explanation ──
+    // After normalizeText, only [ĐÚNG] and [SAI] remain
     const tfMatch = line.match(
-      /^\[(DUNG|SAI|ĐÚNG|Đúng|đúng|sai|Sai)\]\s*(.+)/i,
+      /^\[(ĐÚNG|SAI)\]\s*(.+)/i,
     );
     if (tfMatch) {
       const correctVal = tfMatch[1].toUpperCase();
-      const correct = correctVal === "DUNG" || correctVal === "ĐÚNG";
+      const correct = correctVal === "ĐÚNG";
       const rest = tfMatch[2];
       const pipeIdx = rest.indexOf("|");
       const statement = pipeIdx >= 0 ? rest.substring(0, pipeIdx).trim() : rest.trim();
