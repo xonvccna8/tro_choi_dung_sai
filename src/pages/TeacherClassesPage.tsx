@@ -62,7 +62,7 @@ export function TeacherClassesPage() {
   const [error, setError] = useState<string>("");
   const [showStudentSource, setShowStudentSource] = useState(false);
 
-  const canSync = Boolean(isConfigured && teacherId && profile);
+  const canSync = Boolean(teacherId && profile);
 
   const studentCountByClassId = useMemo(() => {
     const counts = new Map<string, number>();

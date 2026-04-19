@@ -59,6 +59,7 @@ const MOCK_ACCOUNTS: Record<string, { pass: string; role: "admin" | "teacher" | 
   // Giáo viên
   "nvxo@gmail.com": { pass: "123456", role: "teacher", name: "NGUYỄN VĂN XÔ" },
   "ntmb@gmail.com": { pass: "123456", role: "teacher", name: "NGUYỄN THỊ MỸ BÌNH" },
+  "npl@gmail.com": { pass: "123456", role: "teacher", name: "NGUYỄN PHI LONG" },
   "giaovien@app.com": { pass: "123456", role: "teacher", name: "Giáo viên Demo" },
   // Học sinh
   "hs000001@gmail.com": { pass: "000001", role: "student", name: "Huỳnh Thái An" },
@@ -131,7 +132,7 @@ export function LoginPage() {
         // Đăng nhập thành công với tài khoản hardcode
         const acc = MOCK_ACCOUNTS[emailKey];
         const nextUser = {
-          id: `demo-${Date.now()}`,
+          id: `demo-${emailKey.replace(/@.*/, "").replace(/[^a-zA-Z0-9]/g, "")}`,
           name: acc.name,
           avatar: resolveAvatarForRole(acc.role),
           role: acc.role,
@@ -154,7 +155,7 @@ export function LoginPage() {
       else if (emailKey === "giaovien@app.com") { userRole = "teacher"; userName = name.trim() || "Cô giáo Hóa"; }
   
       const nextUser = {
-        id: `demo-${Date.now()}`,
+        id: `demo-${emailKey.replace(/@.*/, "").replace(/[^a-zA-Z0-9]/g, "")}`,
         name: userName,
         avatar: resolveAvatarForRole(userRole),
         role: userRole,

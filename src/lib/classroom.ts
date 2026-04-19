@@ -81,11 +81,19 @@ function createInviteCode() {
 
 export async function listTeacherClasses(teacherId: string): Promise<TeacherClass[]> {
   if (!hasFirebaseConfig) {
-    if (teacherId !== "demo-ntmb" && teacherId !== "demo-nvxo") return [];
-    return [
-      { id: "class-1", name: "12A1 (Nhóm 1)", teacherId: "demo-ntmb", teacherName: "NGUYỄN THỊ MỸ BÌNH", inviteCode: "12A1XM", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" },
-      { id: "class-2", name: "12A2 (Nhóm 2)", teacherId: "demo-ntmb", teacherName: "NGUYỄN THỊ MỸ BÌNH", inviteCode: "12A2YM", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" }
-    ];
+    if (teacherId === "demo-npl") {
+      return [
+        { id: "class-101", name: "12A1 (Toán)", teacherId: "demo-npl", teacherName: "NGUYỄN PHI LONG", inviteCode: "12A1TO", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" },
+        { id: "class-102", name: "12A2 (Toán)", teacherId: "demo-npl", teacherName: "NGUYỄN PHI LONG", inviteCode: "12A2TO", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" }
+      ];
+    }
+    if (teacherId === "demo-ntmb" || teacherId === "demo-nvxo") {
+      return [
+        { id: "class-1", name: "12A1 (Nhóm 1)", teacherId: teacherId, teacherName: teacherId === "demo-ntmb" ? "NGUYỄN THỊ MỸ BÌNH" : "NGUYỄN VĂN XÔ", inviteCode: "12A1XM", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" },
+        { id: "class-2", name: "12A2 (Nhóm 2)", teacherId: teacherId, teacherName: teacherId === "demo-ntmb" ? "NGUYỄN THỊ MỸ BÌNH" : "NGUYỄN VĂN XÔ", inviteCode: "12A2YM", createdAt: "2025-08-15T00:00:00.000Z", updatedAt: "2025-08-15T00:00:00.000Z" }
+      ];
+    }
+    return [];
   }
 
   const database = ensureDb();
@@ -109,7 +117,7 @@ export async function listTeacherClasses(teacherId: string): Promise<TeacherClas
 
 export async function listStudents(): Promise<ClassroomStudent[]> {
   if (!hasFirebaseConfig) {
-    const names = [
+    const baseNames = [
       "Huỳnh Thái An", "Phạm Đình Bảo Anh", "Tống Ngọc Hải Âu", "Nguyễn Trọng Đạt", "Nguyễn Quang Đạt",
       "Nguyễn Anh Đức", "Nguyễn Trung Dũng", "Trần Minh Hoàng", "Nguyễn Văn Huy", "Nguyễn Dũng Kiên",
       "Vũ Tuấn Kiệt", "Hoàng Khánh Ly", "Trần Trà My", "Nguyễn Văn Hoàng Sâm", "Nguyễn Văn Sơn",
@@ -118,7 +126,8 @@ export async function listStudents(): Promise<ClassroomStudent[]> {
       "Lê Huy Hoàng", "Nguyễn Thị Thanh Huyền", "Chương Tấn Sang", "Nguyễn Thị Thảo Sương", "Nguyễn Thị Hà Thủy",
       "Nguyễn Thị Huyền Trang", "Nguyễn Thị Cẩm Tú", "Nguyễn Hoàng Tuấn", "Hà Thảo Uyên", "Lê Thị Bảo Hà"
     ];
-    return names.map((name, i) => ({
+    
+    const chemStudents = baseNames.map((name, i) => ({
       id: `demo-${i+1}`,
       email: `hs${String(i+1).padStart(6, '0')}@gmail.com`,
       name: name,
@@ -127,6 +136,18 @@ export async function listStudents(): Promise<ClassroomStudent[]> {
       className: i < 17 ? "12A1 (Nhóm 1)" : "12A2 (Nhóm 2)",
       teacherId: "demo-ntmb"
     }));
+
+    const mathStudents = baseNames.map((name, i) => ({
+      id: `demo-math-${i+1}`,
+      email: `toan${String(i+1).padStart(6, '0')}@gmail.com`,
+      name: name,
+      avatar: "👨‍🎓",
+      classId: i < 17 ? "class-101" : "class-102",
+      className: i < 17 ? "12A1 (Toán)" : "12A2 (Toán)",
+      teacherId: "demo-npl"
+    }));
+
+    return [...chemStudents, ...mathStudents];
   }
 
   const database = ensureDb();
@@ -156,6 +177,8 @@ export async function createTeacherClass(input: {
   teacherName: string;
   name: string;
 }) {
+  if (!hasFirebaseConfig) throw new Error("Chế độ Demo chưa kết nối Firebase nên tạm thời không thêm mới được.");
+
   const database = ensureDb();
   const classRef = doc(collection(database, "classes"));
   const timestamp = new Date().toISOString();
@@ -188,6 +211,7 @@ export async function assignStudentToClass(input: {
   className: string;
   teacherId: string;
 }) {
+  if (!hasFirebaseConfig) throw new Error("Tính năng gán học sinh bị khóa trong chế độ Demo.");
   const database = ensureDb();
 
   await setDoc(
@@ -203,6 +227,7 @@ export async function assignStudentToClass(input: {
 }
 
 export async function removeStudentFromClass(studentId: string) {
+  if (!hasFirebaseConfig) throw new Error("Tính năng gỡ học sinh bị khóa trong chế độ Demo.");
   const database = ensureDb();
 
   await setDoc(
@@ -218,6 +243,7 @@ export async function removeStudentFromClass(studentId: string) {
 }
 
 export async function deleteTeacherClass(classId: string) {
+  if (!hasFirebaseConfig) throw new Error("Hành động xóa lớp học bị vô hiệu hóa ở chế độ Demo.");
   const database = ensureDb();
   const batch = writeBatch(database);
   const studentsSnapshot = await getDocs(query(collection(database, "users"), where("classId", "==", classId)));
