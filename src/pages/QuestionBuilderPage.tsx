@@ -25,6 +25,7 @@ import type { ArenaRound, QuestionAssignment, QuestionGameMode, SyncedQuestion }
 import { downloadWordTemplate } from "../utils/generateTemplate";
 import { parseDocxFile, parseQuestionFile } from "../utils/questionParser";
 import type { ParsedResult } from "../utils/questionParser";
+import { uploadImageToStorage } from "../lib/uploadImage";
 
 type Tab = "manual" | "upload" | "ai";
 type Feedback = { tone: "success" | "error"; text: string } | null;
@@ -142,6 +143,7 @@ export function QuestionBuilderPage() {
   const [aiSinglePrompt, setAiSinglePrompt] = useState("");
   const [aiMultiPrompt, setAiMultiPrompt] = useState("");
   const [aiStatementPrompts, setAiStatementPrompts] = useState(["", "", "", ""]);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [googleQuery, setGoogleQuery] = useState("");
   const [googleSearching, setGoogleSearching] = useState(false);
   const [googleResults, setGoogleResults] = useState<GoogleSearchResult[]>([]);
@@ -209,6 +211,32 @@ export function QuestionBuilderPage() {
     }
 
     appendToField(fieldKey, text);
+  };
+
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingImage(true);
+      setFeedback({ tone: "success", text: "Đang tải ảnh lên máy chủ, vui lòng đợi..." });
+      
+      const downloadURL = await uploadImageToStorage(file);
+      
+      const imageSyntax = `\n[IMG:${downloadURL}]\n`;
+      handleInsert(imageSyntax);
+      
+      setFeedback({ tone: "success", text: "Tải ảnh thành công! Đã chèn mã ảnh vào ô đang chọn." });
+    } catch (error) {
+      setFeedback({ 
+        tone: "error", 
+        text: error instanceof Error ? error.message : "Có lỗi khi tải ảnh lên." 
+      });
+    } finally {
+      setIsUploadingImage(false);
+      // Reset input file
+      e.target.value = "";
+    }
   };
 
   const updateStmt = (index: number, field: "text" | "correct", value: string | boolean) => {
@@ -751,13 +779,46 @@ export function QuestionBuilderPage() {
                 className="flex w-full items-center justify-between"
               >
                 <span className="text-sm font-bold text-violet-700">
-                  🧪 Công cụ công thức {showToolbar ? "▲" : "▼"}
+                  🧪 Công cụ công thức & Ảnh {showToolbar ? "▲" : "▼"}
                 </span>
                 <span className="text-xs text-slate-400">Bấm ô nhập rồi chọn công thức</span>
               </button>
               {showToolbar && (
-                <div className="mt-2">
+                <div className="mt-4 flex flex-col gap-4 border-t-2 border-slate-100 pt-4">
                   <FormulaToolbar onInsert={handleInsert} />
+                  
+                  {/* Upload Image Section */}
+                  <div className="flex animate-fade-in items-center gap-3 rounded-2xl bg-slate-50 p-3">
+                    <div className="flex bg-white shrink-0 items-center justify-center rounded-xl p-2 shadow-sm text-lg border border-slate-200 text-slate-500">
+                      🖼️
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-slate-700">Chèn Ảnh</p>
+                      <p className="text-xs text-slate-500">
+                        Hệ thống tự nén ảnh. Bấm vào ô text trước khi tải ảnh.
+                      </p>
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        id="image-upload"
+                        onChange={handleImageUpload}
+                        disabled={isUploadingImage}
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-bold shadow-md transition ${
+                          isUploadingImage 
+                            ? "bg-slate-300 text-slate-500" 
+                            : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
+                        }`}
+                      >
+                        {isUploadingImage ? "Đang tải..." : "Tải ảnh lên"}
+                      </label>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

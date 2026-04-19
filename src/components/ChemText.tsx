@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import { ImageLightbox } from "./ImageLightbox";
 
 /* ── Unicode superscript map ── */
 const supMap: Record<string, string> = {
@@ -46,13 +47,13 @@ function renderChemToken(token: string) {
 }
 
 /**
- * Render KaTeX inline math $...$
+ * Render KaTeX math
  */
-function renderKatex(latex: string): string {
+function renderKatex(latex: string, displayMode: boolean): string {
   try {
     return katex.renderToString(latex, {
       throwOnError: false,
-      displayMode: false,
+      displayMode,
     });
   } catch {
     return latex;
@@ -60,63 +61,106 @@ function renderKatex(latex: string): string {
 }
 
 /**
- * Render chemistry-aware text:
- * - KaTeX:       $C_nH_{2n}O_2$ → rendered math
- * - Subscripts:  H2SO4 → H₂SO₄ | CnH2nO2 → CₙH₂ₙO₂
- * - Superscripts: Fe^{2+} → Fe²⁺  |  Ca^2+ → Ca²⁺
- * - Arrows:      -> → →  |  <-> → ⇌
- * - Symbols:     (delta) → Δ  |  (deg) → °
+ * RichText (thay thế ChemText):
+ * - Hỗ trợ Display Math: $$...$$ 
+ * - Hỗ trợ Inline Math: $...$
+ * - Hỗ trợ Ảnh: [IMG:url]
+ * - Auto subscript/superscript hóa học (H2SO4, Fe^{2+})
  */
-export function ChemText({ text }: { text: string }) {
+export function RichText({ text }: { text: string }) {
   if (!text) return null;
 
-  // 1. Tách các segment $...$  ra để render KaTeX riêng
-  const segments = text.split(/(\$[^$]+\$)/g);
+  // Render ảnh trước (tách text thành mảng các segment, mỗi ảnh là 1 dòng riêng)
+  // [IMG:https://...]
+  const imageRegex = /\[IMG:([^\]]+)\]/gi;
+  const blocks = text.split(/(?:<br\s*\/?>|\n)?\s*\[IMG:([^\]]+)\]\s*(?:<br\s*\/?>|\n)?/gi);
 
   return (
-    <span>
-      {segments.map((seg, segIdx) => {
-        // KaTeX segment
-        if (seg.startsWith("$") && seg.endsWith("$") && seg.length > 2) {
-          const latex = seg.slice(1, -1);
-          return (
-            <span
-              key={segIdx}
-              dangerouslySetInnerHTML={{ __html: renderKatex(latex) }}
-            />
-          );
+    <div className="space-y-3">
+      {blocks.map((block, bIdx) => {
+        // Blocks xen kẽ: text bình thường, url ảnh, text bình thường, url ảnh...
+        if (bIdx % 2 === 1) {
+          // Là URL ảnh
+          return <ImageLightbox key={`img-${bIdx}`} src={block.trim()} />;
         }
 
-        // Normal text segment – apply chemistry rendering
-        let processed = seg
-          .replace(/<->/g, "⇌")
-          .replace(/<-->/g, "⇌")
-          .replace(/->/g, "→")
-          .replace(/\(delta\)/gi, "Δ")
-          .replace(/\(deg\)/gi, "°");
+        if (!block.trim()) return null;
 
-        // Convert ^{...} to unicode superscripts
-        processed = processed.replace(/\^\{([^}]+)\}/g, (_, c) => toSuperscript(c));
-
-        // Convert simple ^X patterns
-        processed = processed.replace(/\^(\d+[+-]?|[+-])/g, (_, c) => toSuperscript(c));
-
-        // Tokenize: split by whitespace and punctuation, keeping the separators
-        const tokens = processed.split(/([\s(),.+\-=/[\]:;])/g);
+        // Xử lý Text block chứa KaTeX inline/display và hóa học
+        // 1. Tách display math $$...$$ và inline math $...$
+        // regex logic: tách $$...$$ trước, sau đó bên trong các phần không phải display math sẽ có $...$
+        const mathSegments = block.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/g);
 
         return (
-          <Fragment key={segIdx}>
-            {tokens.map((token, idx) =>
-              // Skip empty or whitespace/punctuation tokens
-              /^[\s(),.+\-=/[\]:;]$/.test(token) || token === "" ? (
-                <Fragment key={idx}>{token}</Fragment>
-              ) : (
-                <Fragment key={idx}>{renderChemToken(token)}</Fragment>
-              )
-            )}
-          </Fragment>
+          <span key={`p-${bIdx}`} className="leading-relaxed">
+            {mathSegments.map((seg, segIdx) => {
+              // Display Math: $$...$$
+              if (seg.startsWith("$$") && seg.endsWith("$$") && seg.length > 4) {
+                const latex = seg.slice(2, -2);
+                return (
+                  <div
+                    key={segIdx}
+                    className="overflow-x-auto py-2 text-center text-lg"
+                    dangerouslySetInnerHTML={{ __html: renderKatex(latex, true) }}
+                  />
+                );
+              }
+
+              // Inline Math: $...$
+              if (seg.startsWith("$") && seg.endsWith("$") && seg.length > 2) {
+                const latex = seg.slice(1, -1);
+                return (
+                  <span
+                    key={segIdx}
+                    dangerouslySetInnerHTML={{ __html: renderKatex(latex, false) }}
+                  />
+                );
+              }
+
+              // Normal text segment – apply chemistry rendering
+              let processed = seg
+                .replace(/<->/g, "⇌")
+                .replace(/<-->/g, "⇌")
+                .replace(/->/g, "→")
+                .replace(/\(delta\)/gi, "Δ")
+                .replace(/\(deg\)/gi, "°");
+
+              // Convert ^{...} to unicode superscripts
+              processed = processed.replace(/\^\{([^}]+)\}/g, (_, c) => toSuperscript(c));
+
+              // Convert simple ^X patterns
+              processed = processed.replace(/\^(\d+[+-]?|[+-])/g, (_, c) => toSuperscript(c));
+
+              // Format newlines
+              const lines = processed.split(/\n|<br\s*\/?>/i);
+
+              return (
+                <Fragment key={segIdx}>
+                  {lines.map((line, lIdx) => {
+                    const tokens = line.split(/([\s(),.+\-=/[\]:;])/g);
+                    return (
+                      <Fragment key={`line-${lIdx}`}>
+                        {lIdx > 0 && <br />}
+                        {tokens.map((token, tIdx) =>
+                          // Skip empty or whitespace/punctuation tokens
+                          /^[\s(),.+\-=/[\]:;]$/.test(token) || token === "" ? (
+                            <Fragment key={tIdx}>{token}</Fragment>
+                          ) : (
+                            <Fragment key={tIdx}>{renderChemToken(token)}</Fragment>
+                          )
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </Fragment>
+              );
+            })}
+          </span>
         );
       })}
-    </span>
+    </div>
   );
 }
+
+// Backward compatibility cho các component dùng ChemText
+export const ChemText = RichText;

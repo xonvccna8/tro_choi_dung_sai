@@ -1,0 +1,36 @@
+Giải pháp 1. Xây dựng thư viện câu hỏi số và giao trò chơi học tập theo chuyên đề
+
+Bước 1. Chuẩn bị
+- Giáo viên rà soát và phân loại các chuyên đề Hóa học thường xuất hiện trong câu hỏi Đúng – Sai và nhiều ý Đúng – Sai, như: Ester – lipid, Carbohydrate, Amine – amino acid – protein, Polymer,...
+- Xây dựng thư viện câu hỏi số theo cấu trúc Lớp → Môn → Chương → Bài → Câu hỏi; mỗi câu hỏi được gắn nhãn chuyên đề, mức độ và chế độ chơi phù hợp.
+- Thiết lập tài khoản lớp học trên hệ thống; kiểm tra thiết bị của học sinh (điện thoại thông minh hoặc máy tính có kết nối Internet).
+- Thống nhất quy định sử dụng thiết bị, thời lượng truy cập, cách đặt tên tài khoản và cách ghi nhận kết quả để đảm bảo học sinh sử dụng đúng mục đích học tập.
+
+Bước 2. Áp dụng vào bài nào, tiết nào cụ thể
+- Áp dụng ngay từ tiết ôn tập đầu tiên của học kỳ để giới thiệu thư viện câu hỏi và cách tham gia trò chơi trên hệ thống.
+- Duy trì ở các tiết ôn theo chuyên đề, ví dụ: Ester – lipid, Carbohydrate, Polymer, hoặc các tiết luyện đề tổng hợp.
+- Trong mỗi tiết ôn, phần giao trò chơi số được sử dụng ở 10 – 15 phút khởi động hoặc 10 phút cuối giờ để cá thể hóa nhiệm vụ cho từng nhóm học sinh.
+
+Bước 3. Địa điểm áp dụng
+- Thực hiện tại lớp học có kết nối mạng.
+- Ở nhà, học sinh đăng nhập tài khoản để tiếp tục làm trò chơi đã được giao và hoàn thành nhiệm vụ còn dang dở.
+
+Bước 4. Tiến hành tổ chức học sinh
+- Giáo viên yêu cầu học sinh mở ứng dụng, đăng nhập tài khoản cá nhân của lớp và chọn đúng trò chơi/chuyên đề đang ôn.
+- Trên màn hình chính, học sinh vào mục trò chơi được giao để hệ thống mở đúng bài mà giáo viên đã phát hành.
+- Mỗi lượt chơi gồm 8 – 10 câu hoặc mệnh đề. Học sinh đọc từng câu, chọn đáp án ngay trên app; với từng mode game, học sinh tương tác theo luật chơi tương ứng.
+- Sau mỗi lượt chọn, hệ thống phản hồi tức thời bằng màu sắc, ký hiệu hoặc điểm số. Nếu trả lời sai, hệ thống hiển thị phần giải thích ngắn gọn, giúp học sinh nhận biết lỗi sai và ghi nhớ kiến thức.
+- Sau khi hoàn thành một lượt, học sinh xem bảng tổng hợp kết quả: số câu đúng, số câu sai, nội dung còn yếu. Các câu sai được lưu vào lịch sử lỗi cá nhân để học sinh xem lại.
+- Trong giờ học, giáo viên cho học sinh làm cá nhân 5 – 7 phút trên app; sau đó tổ chức trao đổi nhanh theo cặp về các câu vừa làm sai. Cuối hoạt động, giáo viên chốt lại các lỗi phổ biến và giao học sinh tiếp tục hoàn thành thêm một lượt chơi ở nhà.
+
+Bước 5. Hiệu quả đạt được
+- Học sinh không còn phải làm cùng một dạng câu hỏi, nhờ đó học sinh yếu được luyện từ mức cơ bản, còn học sinh khá/giỏi được giao các câu có độ phân hóa cao.
+- Giáo viên có dữ liệu theo chuyên đề, theo lớp và theo từng học sinh để điều chỉnh nội dung ôn tập cho tiết sau.
+- Kết quả chơi được lưu lại trên hệ thống, giúp theo dõi tiến độ học tập và mức độ nắm chắc kiến thức của từng em.
+- Tăng hứng thú, tính chủ động và sự tương tác trong giờ ôn tập.
+
+Bước 6. Rút kinh nghiệm
+- Cần chuẩn hóa thư viện câu hỏi trước khi đưa lên hệ thống, tránh câu hỏi quá dài hoặc chưa rõ ý.
+- Nên phân loại câu hỏi theo chuyên đề và mức độ để giao trò chơi sát với năng lực học sinh.
+- Nếu lớp có đường truyền không ổn định, giáo viên nên chuẩn bị phương án dự phòng như làm theo cặp hoặc cho học sinh làm luân phiên.
+- Thường xuyên rà soát dữ liệu kết quả để phát hiện chuyên đề còn yếu và điều chỉnh nhiệm vụ giao trò chơi ở các tiết sau.
