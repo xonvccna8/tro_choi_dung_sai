@@ -41,11 +41,14 @@ function normalizeText(text: string): string {
 /** Match a statement line: a. [ĐÚNG] ... or a. [SAI] ... */
 const STMT_REGEX = /^([a-d])\s*[.)]\s*\[(ĐÚNG|SAI)\]\s*(.+)/i;
 
-/** Match an explanation line */
-const EXP_REGEX = /^(Giai thich|Giải thích|GIAI THICH|GT)\s*[:.]?\s*(.+)/i;
+/** Match the START of an explanation section (content may be empty on same line) */
+const EXP_START_REGEX = /^(Giai thich|Giải thích|GIAI THICH|GT)\s*[:.]?\s*(.*)/i;
 
-/** Match a "Câu X." header line (format 2) */
+/** Match "Câu X." header line (Format 3) */
 const CAU_REGEX = /^Câu\s+\d+[.:)]/i;
+
+/** Match separator/divider lines like ————, ======, ******, etc. */
+const SEPARATOR_REGEX = /^[\u2014\u2013\u2015\-=*_]{3,}\s*$/;
 
 /**
  * Try to build a multi-true-false question from a block of lines.
@@ -68,7 +71,7 @@ function buildMultiQuestion(block: string[]): ParsedMultiTrueFalse | null {
       continue;
     }
 
-    const expMatch = line.match(EXP_REGEX);
+    const expMatch = line.match(EXP_START_REGEX);
     if (expMatch) {
       explanation = expMatch[2].trim();
       continue;
@@ -178,56 +181,72 @@ export function parseQuestionFile(rawContent: string): ParsedResult {
 }
 
 /**
- * Parse Format 3 – rich-context format with "Câu X." headers.
- * Each question block starts with "Câu X." and ends when the next one starts or file ends.
+ * Parse Format 3 – rich-context format with “Câu X.” headers.
+ * Each question block starts with “Câu X.” and ends when the next one starts or file ends.
+ * Supports:
+ *  - Multi-line context paragraphs before a/b/c/d
+ *  - “Giải thích:” on its own line followed by multi-line sub-explanations
+ *  - Separator lines (————, ======...) between questions – ignored
  */
 function parseCauFormat(lines: string[], result: ParsedResult): ParsedResult {
-  // Group lines into question blocks
+  // 1. Filter out pure separator lines before grouping
+  const filteredLines = lines.filter((l) => !SEPARATOR_REGEX.test(l));
+
+  // 2. Group lines into question blocks by "Câu X." headers
   const blocks: string[][] = [];
   let current: string[] | null = null;
 
-  for (const line of lines) {
+  for (const line of filteredLines) {
     if (CAU_REGEX.test(line)) {
-      // Start a new block
       if (current && current.length > 0) blocks.push(current);
       current = [line];
     } else if (current !== null) {
       if (line) current.push(line);
     } else {
       // Lines before the first "Câu X." – check for Format 1 single questions
-      if (/^\[(ĐÚNG|SAI)\]/i.test(line)) {
-        const tfMatch = line.match(/^\[(ĐÚNG|SAI)\]\s*(.+)/i);
-        if (tfMatch) {
-          const correct = tfMatch[1].toUpperCase() === "ĐÚNG";
-          const rest = tfMatch[2];
-          const pipeIdx = rest.indexOf("|");
-          const statement = pipeIdx >= 0 ? rest.substring(0, pipeIdx).trim() : rest.trim();
-          const explanation =
-            pipeIdx >= 0 ? rest.substring(pipeIdx + 1).trim() : "Giáo viên chưa thêm giải thích.";
-          result.trueFalse.push({ statement, correct, explanation });
-        }
+      const tfMatch = line.match(/^\[(ĐÚNG|SAI)\]\s*(.+)/i);
+      if (tfMatch) {
+        const correct = tfMatch[1].toUpperCase() === "ĐÚNG";
+        const rest = tfMatch[2];
+        const pipeIdx = rest.indexOf("|");
+        const statement = pipeIdx >= 0 ? rest.substring(0, pipeIdx).trim() : rest.trim();
+        const explanation =
+          pipeIdx >= 0 ? rest.substring(pipeIdx + 1).trim() : "Giáo viên chưa thêm giải thích.";
+        result.trueFalse.push({ statement, correct, explanation });
       }
     }
   }
   if (current && current.length > 0) blocks.push(current);
 
-  // Parse each block
+  // 3. Parse each block
   for (const block of blocks) {
-    // The first line is "Câu X. – Title", rest is context + a/b/c/d + giải thích
-    // We skip the "Câu X." header line and collect the rest
     const bodyLines = block.slice(1).filter(Boolean);
-
-    // Check if this block contains a/b/c/d statements
     const hasStatements = bodyLines.some((l) => STMT_REGEX.test(l));
 
     if (hasStatements) {
-      // Multi true-false: collect stem (everything before first stmt line)
       const stemLines: string[] = [];
       const statements: { label: string; text: string; correct: boolean }[] = [];
-      let explanation = "";
+      const explanationLines: string[] = [];
       let seenFirstStmt = false;
+      let collectingExplanation = false;
 
       for (const line of bodyLines) {
+        // Check if entering the explanation section
+        const expStartMatch = line.match(EXP_START_REGEX);
+        if (expStartMatch) {
+          collectingExplanation = true;
+          const restOfLine = expStartMatch[2].trim();
+          if (restOfLine) explanationLines.push(restOfLine);
+          continue;
+        }
+
+        // If we're past "Giải thích:", collect all remaining lines as explanation
+        if (collectingExplanation) {
+          explanationLines.push(line.trim());
+          continue;
+        }
+
+        // Match a/b/c/d statement lines
         const stmtMatch = line.match(STMT_REGEX);
         if (stmtMatch) {
           seenFirstStmt = true;
@@ -240,16 +259,14 @@ function parseCauFormat(lines: string[], result: ParsedResult): ParsedResult {
           continue;
         }
 
-        const expMatch = line.match(EXP_REGEX);
-        if (expMatch) {
-          explanation = expMatch[2].trim();
-          continue;
-        }
-
+        // Everything before first statement is part of the stem
         if (!seenFirstStmt) {
           stemLines.push(line.trim());
         }
       }
+
+      // Combine explanation lines into single string
+      const explanation = explanationLines.join(" ").trim();
 
       // Build stem: title line is block[0] without "Câu X." prefix
       const titleLine = block[0].replace(CAU_REGEX, "").trim();
