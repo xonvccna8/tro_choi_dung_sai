@@ -115,7 +115,8 @@ export function LiveBattleRoomPage() {
     [players, room?.winnerId],
   );
 
-  const minimumPlayers = room?.mode === "duel" ? 2 : 2;
+  const minimumPlayers = 2;
+  const isHost = room?.hostId === appUser?.id;
   const questionDurationMs = room ? room.questionDurationSeconds * 1000 : 0;
   const totalBattleDurationMs = room ? room.questions.length * questionDurationMs : 0;
   const scheduledStartMs = room ? new Date(room.scheduledStartAt).getTime() : 0;
@@ -151,21 +152,7 @@ export function LiveBattleRoomPage() {
       });
   }, [appUser, currentPlayer, room]);
 
-  useEffect(() => {
-    if (!room || room.status !== "scheduled" || startingRef.current) return;
-    if (players.length < minimumPlayers) return;
-    if (scheduledRemainingMs > 0) return;
-
-    startingRef.current = true;
-
-    void startBattleRoom(room.id)
-      .catch((error) => {
-        setErrorMessage(error instanceof Error ? error.message : "Không thể bắt đầu phòng đấu.");
-      })
-      .finally(() => {
-        startingRef.current = false;
-      });
-  }, [minimumPlayers, players.length, room, scheduledRemainingMs]);
+  // Auto-start đã được tắt — chỉ GV (host) mới bấm "Bắt đầu ngay" được
 
   useEffect(() => {
     if (!room || room.status !== "live" || finishingRef.current) return;
@@ -514,68 +501,144 @@ export function LiveBattleRoomPage() {
             )}
 
             {room.status === "live" && currentQuestion && (
-              <section className="rounded-[2rem] border border-white/50 bg-white/95 p-6 shadow-xl">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Câu hiện tại</p>
-                    <h3 className="mt-2 text-2xl font-black text-slate-900">Câu {currentQuestionIndex + 1}/{room.questions.length}</h3>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-50 px-4 py-3">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Thời gian câu này</p>
-                      <p className="mt-1 text-2xl font-black text-slate-900">{formatClock(Math.ceil(currentQuestionRemainingMs / 1000))}</p>
+              <>
+                {/* ── GV/Host: Màn hình giám sát đua điểm kiểu Quizizz ── */}
+                {isHost && (
+                  <section className="overflow-hidden rounded-[2rem] border border-white/50 bg-white/95 shadow-xl">
+                    <div className="relative bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 px-6 py-5 text-white">
+                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.15),transparent_60%)]" />
+                      <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-black uppercase tracking-[0.2em] text-white/70">Đang thi · Câu {currentQuestionIndex + 1}/{room.questions.length}</p>
+                          <p className="mt-1 text-lg font-medium text-white/90"><RichContentBlock text={currentQuestion.statement} className="text-white" /></p>
+                        </div>
+                        <div className="flex gap-3">
+                          <div className="rounded-2xl bg-white/20 px-4 py-3 text-center">
+                            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/60">Câu này</p>
+                            <p className="mt-1 text-2xl font-black">{formatClock(Math.ceil(currentQuestionRemainingMs / 1000))}</p>
+                          </div>
+                          <div className="rounded-2xl bg-white/20 px-4 py-3 text-center">
+                            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/60">Tổng</p>
+                            <p className="mt-1 text-2xl font-black">{formatClock(Math.ceil(totalRemainingMs / 1000))}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="relative z-10 mt-4 h-2 overflow-hidden rounded-full bg-white/20">
+                        <div className="h-full rounded-full bg-white transition-all" style={{ width: `${(currentQuestionRemainingMs / Math.max(questionDurationMs, 1)) * 100}%` }} />
+                      </div>
                     </div>
-                    <div className="rounded-2xl bg-slate-50 px-4 py-3">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Tổng thời gian còn lại</p>
-                      <p className="mt-1 text-2xl font-black text-slate-900">{formatClock(Math.ceil(totalRemainingMs / 1000))}</p>
+
+                    {/* Bảng đua điểm realtime */}
+                    <div className="p-6">
+                      <h3 className="mb-4 text-lg font-black text-slate-900">🏁 Bảng đua điểm trực tiếp</h3>
+                      <div className="space-y-3">
+                        {players.map((player, index) => {
+                          const maxScore = Math.max(1, ...players.map(p => p.score));
+                          const barWidth = Math.max(5, (player.score / maxScore) * 100);
+                          const colors = ["from-amber-400 to-orange-500", "from-sky-400 to-blue-500", "from-emerald-400 to-teal-500", "from-rose-400 to-pink-500", "from-violet-400 to-purple-500"];
+                          const rankEmoji = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`;
+                          return (
+                            <div key={player.userId} className="flex items-center gap-3">
+                              <span className="w-8 text-center text-lg font-black">{rankEmoji}</span>
+                              <div className="flex-1">
+                                <div className="mb-1 flex items-center justify-between">
+                                  <span className="text-sm font-black text-slate-800">{player.avatar} {player.name}</span>
+                                  <span className="text-sm font-black text-slate-600">{player.score} đ · {player.correctCount}/{player.answeredCount}</span>
+                                </div>
+                                <div className="h-8 overflow-hidden rounded-xl bg-slate-100">
+                                  <div
+                                    className={`flex h-full items-center rounded-xl bg-gradient-to-r px-3 text-xs font-black text-white shadow-sm transition-all duration-500 ${colors[index % colors.length]}`}
+                                    style={{ width: `${barWidth}%` }}
+                                  >
+                                    {player.score > 0 && `${player.score}`}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="mt-5 grid grid-cols-3 gap-3">
+                        <div className="rounded-2xl bg-emerald-50 p-3 text-center">
+                          <p className="text-xs font-bold text-emerald-600">Đã trả lời</p>
+                          <p className="mt-1 text-xl font-black text-emerald-700">{players.reduce((s, p) => s + p.answeredCount, 0)}</p>
+                        </div>
+                        <div className="rounded-2xl bg-violet-50 p-3 text-center">
+                          <p className="text-xs font-bold text-violet-600">Trả lời đúng</p>
+                          <p className="mt-1 text-xl font-black text-violet-700">{players.reduce((s, p) => s + p.correctCount, 0)}</p>
+                        </div>
+                        <div className="rounded-2xl bg-amber-50 p-3 text-center">
+                          <p className="text-xs font-bold text-amber-600">Điểm cao nhất</p>
+                          <p className="mt-1 text-xl font-black text-amber-700">{Math.max(0, ...players.map(p => p.score))}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </section>
+                )}
 
-                <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all"
-                    style={{ width: `${(currentQuestionRemainingMs / Math.max(questionDurationMs, 1)) * 100}%` }}
-                  />
-                </div>
+                {/* ── Học sinh: Giao diện trả lời câu hỏi ── */}
+                {!isHost && (
+                  <section className="rounded-[2rem] border border-white/50 bg-white/95 p-6 shadow-xl">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Câu hiện tại</p>
+                        <h3 className="mt-2 text-2xl font-black text-slate-900">Câu {currentQuestionIndex + 1}/{room.questions.length}</h3>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl bg-slate-50 px-4 py-3">
+                          <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Thời gian câu này</p>
+                          <p className="mt-1 text-2xl font-black text-slate-900">{formatClock(Math.ceil(currentQuestionRemainingMs / 1000))}</p>
+                        </div>
+                        <div className="rounded-2xl bg-slate-50 px-4 py-3">
+                          <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Tổng còn</p>
+                          <p className="mt-1 text-2xl font-black text-slate-900">{formatClock(Math.ceil(totalRemainingMs / 1000))}</p>
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="mt-6 rounded-[1.75rem] bg-slate-50 p-5">
-                  <RichContentBlock text={currentQuestion.statement} className="text-xl font-semibold text-slate-900" />
-                </div>
+                    <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all" style={{ width: `${(currentQuestionRemainingMs / Math.max(questionDurationMs, 1)) * 100}%` }} />
+                    </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={() => void handleAnswer(true)}
-                    disabled={Boolean(currentAnswer) || Boolean(submittingQuestionId) || currentQuestionRemainingMs <= 0}
-                    className="rounded-2xl bg-emerald-500 px-5 py-4 text-lg font-black text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Đúng
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleAnswer(false)}
-                    disabled={Boolean(currentAnswer) || Boolean(submittingQuestionId) || currentQuestionRemainingMs <= 0}
-                    className="rounded-2xl bg-rose-500 px-5 py-4 text-lg font-black text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Sai
-                  </button>
-                </div>
+                    <div className="mt-6 rounded-[1.75rem] bg-slate-50 p-5">
+                      <RichContentBlock text={currentQuestion.statement} className="text-xl font-semibold text-slate-900" />
+                    </div>
 
-                <div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600">
-                  {currentAnswer ? (
-                    <span className="inline-flex items-center gap-2 text-emerald-700">
-                      <CheckCircle2 className="h-4 w-4" />
-                      Đã khóa đáp án.
-                    </span>
-                  ) : (
-                    <span>Nhanh hơn = nhiều điểm hơn.</span>
-                  )}
-                </div>
+                    <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={() => void handleAnswer(true)}
+                        disabled={Boolean(currentAnswer) || Boolean(submittingQuestionId) || currentQuestionRemainingMs <= 0}
+                        className="rounded-2xl bg-emerald-500 px-5 py-4 text-lg font-black text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Đúng
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleAnswer(false)}
+                        disabled={Boolean(currentAnswer) || Boolean(submittingQuestionId) || currentQuestionRemainingMs <= 0}
+                        className="rounded-2xl bg-rose-500 px-5 py-4 text-lg font-black text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Sai
+                      </button>
+                    </div>
 
-                {answerMessage && <p className="mt-4 rounded-xl bg-violet-50 px-4 py-3 text-sm font-medium text-violet-700">{answerMessage}</p>}
-              </section>
+                    <div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600">
+                      {currentAnswer ? (
+                        <span className="inline-flex items-center gap-2 text-emerald-700">
+                          <CheckCircle2 className="h-4 w-4" />
+                          Đã khóa đáp án.
+                        </span>
+                      ) : (
+                        <span>Nhanh hơn = nhiều điểm hơn.</span>
+                      )}
+                    </div>
+
+                    {answerMessage && <p className="mt-4 rounded-xl bg-violet-50 px-4 py-3 text-sm font-medium text-violet-700">{answerMessage}</p>}
+                  </section>
+                )}
+              </>
             )}
 
             {room.status === "finished" && (

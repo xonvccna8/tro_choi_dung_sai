@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,15 +11,33 @@ import {
   Swords,
   Trophy,
   Users,
+  Zap,
 } from "lucide-react";
 import { LogoutButton } from "../components/LogoutButton";
 import { useGameStore } from "../store/useGameStore";
+import {
+  findBattleRoomByCode,
+  joinMatchmakingQueue,
+  leaveMatchmakingQueue,
+  subscribeToOwnMatchEntry,
+  findWaitingOpponent,
+  fetchRandomBattleQuestions,
+  createMatchedDuelRoom,
+  cleanupMatchmakingEntry,
+} from "../lib/liveBattle";
 
 export function DirectGamesPage() {
+  const navigate = useNavigate();
   const user = useGameStore((state) => state.user);
   const logoutTone: "admin" | "teacher" | "student" =
     user?.role === "teacher" ? "teacher" : user?.role === "admin" ? "admin" : "student";
 
+  // ────── Học sinh: Giao diện đơn giản ──────
+  if (user?.role === "student") {
+    return <StudentDirectView />;
+  }
+
+  // ────── Giáo viên / Admin: Giao diện đầy đủ ──────
   const roleCard =
     user?.role === "teacher"
       ? {
@@ -29,23 +48,14 @@ export function DirectGamesPage() {
             { label: "Phát mã", icon: <KeyRound className="h-3.5 w-3.5" /> },
           ],
         }
-      : user?.role === "admin"
-        ? {
-            title: "Xem luồng",
-            chips: [
-              { label: "Xem thử", icon: <ShieldCheck className="h-3.5 w-3.5" /> },
-              { label: "Di động", icon: <Sparkles className="h-3.5 w-3.5" /> },
-              { label: "Trực tiếp", icon: <Radio className="h-3.5 w-3.5" /> },
-            ],
-          }
-        : {
-            title: "Học sinh",
-            chips: [
-              { label: "Chọn", icon: <Sparkles className="h-3.5 w-3.5" /> },
-              { label: "Nhập mã", icon: <KeyRound className="h-3.5 w-3.5" /> },
-              { label: "Vào chơi", icon: <Swords className="h-3.5 w-3.5" /> },
-            ],
-          };
+      : {
+          title: "Xem luồng",
+          chips: [
+            { label: "Xem thử", icon: <ShieldCheck className="h-3.5 w-3.5" /> },
+            { label: "Di động", icon: <Sparkles className="h-3.5 w-3.5" /> },
+            { label: "Trực tiếp", icon: <Radio className="h-3.5 w-3.5" /> },
+          ],
+        };
 
   const directModes = [
     {
@@ -91,18 +101,9 @@ export function DirectGamesPage() {
   ];
 
   const steps = [
-    {
-      title: "Chọn chế độ",
-      icon: <Sparkles className="h-4 w-4" />,
-    },
-    {
-      title: "Nhập mã",
-      icon: <KeyRound className="h-4 w-4" />,
-    },
-    {
-      title: "Xem BXH",
-      icon: <Trophy className="h-4 w-4" />,
-    },
+    { title: "Chọn chế độ", icon: <Sparkles className="h-4 w-4" /> },
+    { title: "Nhập mã", icon: <KeyRound className="h-4 w-4" /> },
+    { title: "Xem BXH", icon: <Trophy className="h-4 w-4" /> },
   ];
 
   return (
@@ -259,6 +260,295 @@ export function DirectGamesPage() {
           </div>
         </div>
       </section>
+    </main>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GIAO DIỆN HỌC SINH
+   - 1v1: bấm "Thách đấu" → tự tìm đối thủ online
+   - 1 & Lớp: nhập mã từ GV
+   ═══════════════════════════════════════════════════════════════ */
+
+function StudentDirectView() {
+  const navigate = useNavigate();
+  const user = useGameStore((state) => state.user);
+  const [tab, setTab] = useState<"duel" | "class">("duel");
+  const [joinCode, setJoinCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [matchmaking, setMatchmaking] = useState(false);
+  const [matchStatus, setMatchStatus] = useState("Đang tìm đối thủ...");
+  const matchSubRef = useRef<(() => void) | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Cleanup khi rời trang
+  useEffect(() => {
+    return () => {
+      if (matchSubRef.current) matchSubRef.current();
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      // Rời hàng chờ nếu đang tìm
+      if (user?.id) void leaveMatchmakingQueue(user.id);
+    };
+  }, [user?.id]);
+
+  // ── Tự tìm đối thủ 1v1 ──
+  const handleStartMatchmaking = async () => {
+    if (!user) return;
+    setMatchmaking(true);
+    setError("");
+    setMatchStatus("Đang vào hàng chờ...");
+
+    try {
+      // 1. Vào hàng chờ
+      await joinMatchmakingQueue(user);
+      setMatchStatus("Đang tìm đối thủ online...");
+
+      // 2. Lắng nghe entry của mình — khi bị matched sẽ nhận roomId
+      matchSubRef.current = subscribeToOwnMatchEntry(
+        user.id,
+        (roomId) => {
+          // Đã được ghép! Navigate vào phòng
+          setMatchStatus("Đã tìm thấy đối thủ! Đang vào phòng...");
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          void cleanupMatchmakingEntry(user.id);
+          setTimeout(() => navigate(`/game/battle/${roomId}`), 500);
+        },
+        () => {
+          // Entry bị xóa (có thể do timeout)
+        },
+      );
+
+      // 3. Thử tìm đối thủ đang chờ ngay
+      await tryMatchNow();
+
+      // 4. Polling mỗi 3 giây để tìm đối thủ mới
+      pollingRef.current = setInterval(() => {
+        void tryMatchNow();
+      }, 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Không thể tìm đối thủ.");
+      setMatchmaking(false);
+    }
+  };
+
+  const tryMatchNow = async () => {
+    if (!user) return;
+    try {
+      const opponent = await findWaitingOpponent(user.id);
+      if (!opponent) return; // Chưa có ai, tiếp tục chờ
+
+      // Tìm thấy! Lấy câu hỏi và tạo phòng
+      setMatchStatus(`Đã tìm thấy ${opponent.name}! Đang tạo trận...`);
+      const questions = await fetchRandomBattleQuestions(8);
+
+      if (questions.length < 5) {
+        setError("Ngân hàng chưa đủ 5 câu Đúng/Sai để tạo trận.");
+        setMatchmaking(false);
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        void leaveMatchmakingQueue(user.id);
+        return;
+      }
+
+      const roomId = await createMatchedDuelRoom(user, opponent, questions);
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      void cleanupMatchmakingEntry(user.id);
+      navigate(`/game/battle/${roomId}`);
+    } catch {
+      // Có thể đối thủ đã bị ghép bởi người khác, tiếp tục chờ
+    }
+  };
+
+  const handleCancelMatchmaking = async () => {
+    if (matchSubRef.current) matchSubRef.current();
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    if (user) await leaveMatchmakingQueue(user.id);
+    setMatchmaking(false);
+    setError("");
+  };
+
+  // ── Nhập mã phòng GV ──
+  const handleJoinByCode = async () => {
+    const code = joinCode.trim().toUpperCase();
+    if (code.length < 4) {
+      setError("Mã phòng cần ít nhất 4 ký tự.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const room = await findBattleRoomByCode(code);
+      if (!room) {
+        setError("Không tìm thấy phòng với mã này.");
+        return;
+      }
+      if (room.status === "finished") {
+        setError("Phòng này đã kết thúc rồi.");
+        return;
+      }
+      navigate(`/game/battle/${room.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Không thể vào phòng.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <main className="mx-auto max-w-lg px-4 py-6 pb-10 animate-in fade-in slide-in-from-bottom-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Link
+          to="/games"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/80 bg-white/90 text-slate-600 shadow-md transition hover:bg-white"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <LogoutButton tone="student" compact />
+      </div>
+
+      {/* Hero */}
+      <div className="mt-6 flex flex-col items-center text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-violet-600 via-fuchsia-500 to-sky-500 text-white shadow-[0_16px_40px_rgba(109,40,217,0.35)]">
+          <Swords className="h-10 w-10" />
+        </div>
+        <h1 className="mt-4 text-2xl font-black text-white">Đối kháng trực tiếp</h1>
+        <p className="mt-1 text-sm text-white/70">Chọn chế độ để bắt đầu</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="mt-6 grid grid-cols-2 gap-2 rounded-2xl bg-white/20 p-1">
+        <button
+          type="button"
+          onClick={() => { setTab("duel"); setError(""); }}
+          className={`rounded-xl px-4 py-3 text-sm font-black transition ${
+            tab === "duel" ? "bg-white text-violet-700 shadow-md" : "text-white/80 hover:bg-white/10"
+          }`}
+        >
+          ⚔️ 1 & 1
+        </button>
+        <button
+          type="button"
+          onClick={() => { setTab("class"); setError(""); setMatchmaking(false); handleCancelMatchmaking(); }}
+          className={`rounded-xl px-4 py-3 text-sm font-black transition ${
+            tab === "class" ? "bg-white text-sky-700 shadow-md" : "text-white/80 hover:bg-white/10"
+          }`}
+        >
+          👥 1 & Lớp
+        </button>
+      </div>
+
+      {/* ── Tab 1v1: Thách đấu tự động ── */}
+      {tab === "duel" && (
+        <div className="mt-5 animate-in fade-in slide-in-from-bottom-2">
+          <div className="overflow-hidden rounded-[1.5rem] border-2 border-white/50 bg-white/95 shadow-xl">
+            {!matchmaking ? (
+              <div className="p-6 text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg">
+                  <Swords className="h-8 w-8" />
+                </div>
+                <h3 className="mt-4 text-lg font-black text-slate-900">Thách đấu 1v1</h3>
+                <p className="mt-2 text-sm text-slate-500">Bấm nút bên dưới để tự động tìm đối thủ đang online. Khi đủ 2 người, trận đấu bắt đầu ngay!</p>
+
+                <button
+                  type="button"
+                  onClick={handleStartMatchmaking}
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-4 text-base font-black text-white shadow-lg transition hover:shadow-xl active:scale-[0.98]"
+                >
+                  <Zap className="h-5 w-5" />
+                  Thách đấu ngay!
+                </button>
+
+                <div className="mt-4 grid grid-cols-3 divide-x divide-slate-100 rounded-2xl border border-slate-100 bg-slate-50">
+                  <div className="p-3 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-400">Chế độ</p>
+                    <p className="mt-1 text-xs font-black text-slate-700">2 người</p>
+                  </div>
+                  <div className="p-3 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-400">Câu hỏi</p>
+                    <p className="mt-1 text-xs font-black text-slate-700">8 câu</p>
+                  </div>
+                  <div className="p-3 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-400">Thưởng</p>
+                    <p className="mt-1 text-xs font-black text-amber-600">Vàng + EXP</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Đang tìm đối thủ */
+              <div className="p-6 text-center">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-violet-100">
+                  <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600" />
+                </div>
+                <h3 className="mt-4 text-lg font-black text-slate-900">{matchStatus}</h3>
+                <p className="mt-2 text-sm text-slate-500">Chờ 1 bạn khác cũng bấm "Thách đấu" là bắt đầu ngay</p>
+
+                <div className="mt-5 flex justify-center gap-2">
+                  <span className="inline-flex h-3 w-3 animate-bounce rounded-full bg-violet-500" style={{ animationDelay: "0ms" }} />
+                  <span className="inline-flex h-3 w-3 animate-bounce rounded-full bg-fuchsia-500" style={{ animationDelay: "150ms" }} />
+                  <span className="inline-flex h-3 w-3 animate-bounce rounded-full bg-sky-500" style={{ animationDelay: "300ms" }} />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCancelMatchmaking}
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+                >
+                  Hủy tìm đối thủ
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab 1 & Lớp: Nhập mã GV ── */}
+      {tab === "class" && (
+        <div className="mt-5 animate-in fade-in slide-in-from-bottom-2">
+          <div className="overflow-hidden rounded-[1.5rem] border-2 border-white/50 bg-white/95 p-5 shadow-xl">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+                <KeyRound className="h-7 w-7" />
+              </div>
+              <h3 className="mt-3 text-lg font-black text-slate-900">Nhập mã phòng</h3>
+              <p className="mt-1 text-sm text-slate-500">Giáo viên sẽ cung cấp mã 6 ký tự</p>
+            </div>
+
+            <input
+              value={joinCode}
+              onChange={(e) => { setJoinCode(e.target.value.toUpperCase()); setError(""); }}
+              onKeyDown={(e) => e.key === "Enter" && handleJoinByCode()}
+              className="mt-4 w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-4 text-center text-3xl font-black uppercase tracking-[0.45em] outline-none transition focus:border-sky-400 focus:bg-white focus:ring-4 focus:ring-sky-100"
+              placeholder="_ _ _ _ _ _"
+              maxLength={6}
+              autoComplete="off"
+              spellCheck={false}
+            />
+
+            <button
+              type="button"
+              onClick={handleJoinByCode}
+              disabled={busy || joinCode.trim().length < 4}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 px-5 py-4 text-base font-black text-white shadow-lg transition hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Users className="h-5 w-5" />
+              {busy ? "Đang vào phòng..." : "Vào thi ngay"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Lỗi */}
+      {error && (
+        <div className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-center text-sm font-medium text-rose-700 shadow-sm">
+          {error}
+        </div>
+      )}
+
+      {/* Tên người chơi */}
+      <p className="mt-6 text-center text-xs text-white/50">
+        {user?.avatar} {user?.name}
+      </p>
     </main>
   );
 }

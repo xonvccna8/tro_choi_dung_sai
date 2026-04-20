@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -452,4 +453,187 @@ export async function claimBattleReward(roomId: string, playerId: string) {
   await updateDoc(doc(database, "battleRooms", roomId, "players", playerId), {
     rewardClaimedAt: new Date().toISOString(),
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTO-MATCHMAKING: Tự tìm đối thủ 1v1
+// ═══════════════════════════════════════════════════════════
+
+export type MatchmakingEntry = {
+  userId: string;
+  name: string;
+  avatar: string;
+  status: "waiting" | "matched";
+  roomId: string | null;
+  createdAt: string;
+};
+
+/** Thêm học sinh vào hàng chờ tìm đối thủ */
+export async function joinMatchmakingQueue(user: AppUser) {
+  const database = ensureDb();
+  await setDoc(doc(database, "matchmakingQueue", user.id), {
+    userId: user.id,
+    name: user.name,
+    avatar: user.avatar,
+    status: "waiting",
+    roomId: null,
+    createdAt: new Date().toISOString(),
+  } satisfies MatchmakingEntry);
+}
+
+/** Rời hàng chờ */
+export async function leaveMatchmakingQueue(userId: string) {
+  const database = ensureDb();
+  try {
+    await deleteDoc(doc(database, "matchmakingQueue", userId));
+  } catch {
+    // Bỏ qua nếu đã xóa
+  }
+}
+
+/** Lắng nghe trạng thái entry của mình — khi bị matched sẽ có roomId */
+export function subscribeToOwnMatchEntry(
+  userId: string,
+  onMatched: (roomId: string) => void,
+  onRemoved: () => void,
+) {
+  const database = ensureDb();
+  return onSnapshot(doc(database, "matchmakingQueue", userId), (snapshot) => {
+    if (!snapshot.exists()) {
+      onRemoved();
+      return;
+    }
+    const data = snapshot.data() as MatchmakingEntry;
+    if (data.status === "matched" && data.roomId) {
+      onMatched(data.roomId);
+    }
+  });
+}
+
+/** Tìm đối thủ đang chờ trong hàng (trừ chính mình) */
+export async function findWaitingOpponent(
+  myUserId: string,
+): Promise<MatchmakingEntry | null> {
+  const database = ensureDb();
+  const snapshot = await getDocs(
+    query(
+      collection(database, "matchmakingQueue"),
+      where("status", "==", "waiting"),
+    ),
+  );
+
+  for (const item of snapshot.docs) {
+    if (item.id !== myUserId) {
+      return item.data() as MatchmakingEntry;
+    }
+  }
+  return null;
+}
+
+/** Lấy ngẫu nhiên câu hỏi Đúng/Sai từ Firestore */
+export async function fetchRandomBattleQuestions(
+  count: number,
+): Promise<BattleRoomQuestion[]> {
+  const database = ensureDb();
+  const snapshot = await getDocs(collection(database, "questions"));
+  const pool: BattleRoomQuestion[] = [];
+
+  for (const item of snapshot.docs) {
+    const data = item.data();
+    if (
+      data.type === "true-false" &&
+      typeof data.statement === "string" &&
+      typeof data.correct === "boolean"
+    ) {
+      pool.push({
+        id: item.id,
+        statement: data.statement,
+        correct: data.correct,
+        explanation: typeof data.explanation === "string" ? data.explanation : "",
+      });
+    }
+  }
+
+  // Trộn ngẫu nhiên
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  return pool.slice(0, count);
+}
+
+/** Ghép trận: tạo phòng, cập nhật cả 2 entry, trả về roomId */
+export async function createMatchedDuelRoom(
+  me: AppUser,
+  opponent: MatchmakingEntry,
+  questions: BattleRoomQuestion[],
+  questionDurationSeconds = 20,
+) {
+  const database = ensureDb();
+  const roomRef = doc(collection(database, "battleRooms"));
+  const code = await reserveRoomCode();
+  const now = new Date().toISOString();
+
+  const batch = writeBatch(database);
+
+  // Tạo phòng đấu — trạng thái "live" để bắt đầu ngay
+  batch.set(roomRef, {
+    code,
+    title: `${me.name} vs ${opponent.name}`,
+    mode: "duel" as BattleMode,
+    hostId: me.id,
+    hostName: me.name,
+    hostAvatar: me.avatar,
+    status: "live" as BattleRoomStatus,
+    questions,
+    questionDurationSeconds,
+    scheduledStartAt: now,
+    startedAt: now,
+    finishedAt: null,
+    maxPlayers: 2,
+    prizeGoldWinner: 180,
+    prizeGoldParticipation: 35,
+    winnerId: null,
+    createdAt: now,
+    updatedAt: now,
+  } satisfies BattleRoomDocument);
+
+  // Thêm cả 2 người chơi
+  batch.set(
+    doc(database, "battleRooms", roomRef.id, "players", me.id),
+    buildInitialPlayer(me),
+  );
+  batch.set(
+    doc(database, "battleRooms", roomRef.id, "players", opponent.userId),
+    buildInitialPlayer({
+      id: opponent.userId,
+      name: opponent.name,
+      avatar: opponent.avatar,
+      role: "student",
+    } as AppUser),
+  );
+
+  // Cập nhật matchmaking queue — đánh dấu matched
+  batch.update(doc(database, "matchmakingQueue", me.id), {
+    status: "matched",
+    roomId: roomRef.id,
+  });
+  batch.update(doc(database, "matchmakingQueue", opponent.userId), {
+    status: "matched",
+    roomId: roomRef.id,
+  });
+
+  await batch.commit();
+  return roomRef.id;
+}
+
+/** Dọn dẹp entry khỏi hàng chờ sau khi đã vào phòng */
+export async function cleanupMatchmakingEntry(userId: string) {
+  const database = ensureDb();
+  try {
+    await deleteDoc(doc(database, "matchmakingQueue", userId));
+  } catch {
+    // OK
+  }
 }

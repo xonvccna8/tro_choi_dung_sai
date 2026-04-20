@@ -70,7 +70,7 @@ export function LiveBattleHubPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const trueFalsePool = useMemo(() => questions.filter(isTrueFalseQuestion), [questions]);
-  const canUseRealtimeBattle = Boolean(isConfigured && currentUser && appUser);
+  const canUseRealtimeBattle = Boolean(isConfigured && appUser);
   const modeLabel = mode === "duel" ? "Đối kháng 1 & 1" : "Đối kháng 1 & lớp";
 
   const featureNotes =

@@ -242,7 +242,7 @@ export function TeacherDashboardPage() {
             <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
               <div className="mb-6 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">Phủ game</h3>
+                  <h3 className="text-xl font-black text-slate-900">Hành trình học tập</h3>
                   <div className="mt-2 inline-flex rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-indigo-700">
                     5 nhóm chính
                   </div>

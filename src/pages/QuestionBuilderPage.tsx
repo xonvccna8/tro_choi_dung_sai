@@ -19,7 +19,6 @@ import {
   generateMultiQuestionWithAI,
   generateSingleQuestionWithAI,
 } from "../lib/aiQuestionGenerator";
-import { searchChemistryExercises, type GoogleSearchResult } from "../lib/googleSearch";
 import { useGameStore } from "../store/useGameStore";
 import type { ArenaRound, QuestionAssignment, QuestionGameMode, SyncedQuestion } from "../types";
 import { downloadWordTemplate } from "../utils/generateTemplate";
@@ -144,10 +143,6 @@ export function QuestionBuilderPage() {
   const [aiMultiPrompt, setAiMultiPrompt] = useState("");
   const [aiStatementPrompts, setAiStatementPrompts] = useState(["", "", "", ""]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [googleQuery, setGoogleQuery] = useState("");
-  const [googleSearching, setGoogleSearching] = useState(false);
-  const [googleResults, setGoogleResults] = useState<GoogleSearchResult[]>([]);
-  const [googleError, setGoogleError] = useState("");
 
   const summary = useMemo(
     () => ({
@@ -576,21 +571,7 @@ export function QuestionBuilderPage() {
     }
   };
 
-  const handleGoogleSearch = async () => {
-    if (!googleQuery.trim()) return;
-    setGoogleSearching(true);
-    setGoogleError("");
-    setGoogleResults([]);
-    try {
-      const items = await searchChemistryExercises(googleQuery);
-      setGoogleResults(items);
-      if (items.length === 0) setGoogleError("Không tìm thấy kết quả nào phù hợp.");
-    } catch (err) {
-      setGoogleError(err instanceof Error ? err.message : "Tìm kiếm thất bại.");
-    } finally {
-      setGoogleSearching(false);
-    }
-  };
+
 
   if (!isConfigured) {
     return (
@@ -965,78 +946,11 @@ export function QuestionBuilderPage() {
                     AI chỉ sinh nội dung và đổ vào form soạn tay để bạn rà soát trước khi lưu. Cách này an toàn hơn và giữ chất lượng tốt hơn.
                   </p>
                 </div>
-                <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                  <p className="font-bold">Model</p>
-                  <p>gpt-5.4-mini</p>
-                </div>
-              </div>
 
-              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                Cần cấu hình `OPENAI_API_KEY` trên server hoặc Vercel để dùng tính năng này. Tôi sẽ không nhúng API key trực tiếp vào mã client.
-              </div>
-
-              {/* Bước 1: Tìm bài tập trên Google */}
-              <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-                <h4 className="font-bold text-blue-700">🔍 Bước 1: Tìm bài tập Đúng/Sai trên mạng</h4>
-                <p className="mt-1 text-xs text-blue-600">Google tìm → GPT chọn lọc bài tốt nhất → hiện kết quả để bạn dùng làm gợi ý.</p>
-                <div className="mt-2 flex gap-2">
-                  <input
-                    value={googleQuery}
-                    onChange={(e) => setGoogleQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleGoogleSearch()}
-                    className="flex-1 rounded-xl border-2 border-blue-200 bg-white p-2 text-sm focus:border-blue-400 focus:outline-none"
-                    placeholder="Ví dụ: điều chế ester, phản ứng xà phòng hóa, kim loại kiềm..."
-                  />
-                  <button
-                    type="button"
-                    onClick={handleGoogleSearch}
-                    disabled={googleSearching}
-                    className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-                  >
-                    {googleSearching ? "⏳" : "Tìm"}
-                  </button>
-                </div>
-                {googleSearching && (
-                  <p className="mt-2 animate-pulse text-xs text-blue-500">⏳ Google đang tìm → GPT đang chọn lọc bài hay nhất...</p>
-                )}
-                {googleError && <p className="mt-2 text-xs text-red-600">{googleError}</p>}
-                {googleResults.length > 0 && (
-                  <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
-                    <p className="text-xs font-bold text-blue-600">✨ GPT chọn được {googleResults.length} bài phù hợp nhất:</p>
-                    {googleResults.map((item, idx) => (
-                      <div key={idx} className={`rounded-xl border p-3 ${idx === 0 ? "border-emerald-300 bg-emerald-50" : "border-blue-100 bg-white"}`}>
-                        {idx === 0 && <span className="mb-1 inline-block rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-bold text-white">⭐ Tốt nhất</span>}
-                        <a href={item.link} target="_blank" rel="noopener noreferrer" className="mt-1 block text-sm font-bold text-blue-700 hover:underline">
-                          {item.title}
-                        </a>
-                        {item.note && (
-                          <p className="mt-1 rounded-lg bg-amber-50 px-2 py-1 text-xs text-amber-700">💡 {item.note}</p>
-                        )}
-                        <p className="mt-1 line-clamp-3 text-xs text-slate-600">{item.snippet}</p>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => { setAiSinglePrompt(item.snippet); setAiMode("single"); }}
-                            className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-200"
-                          >
-                            → Dùng cho câu đơn
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { setAiMultiPrompt(item.snippet); setAiMode("multi"); }}
-                            className="rounded-lg bg-teal-100 px-2 py-1 text-xs font-bold text-teal-700 hover:bg-teal-200"
-                          >
-                            → Dùng cho câu 4 ý
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                📝 <strong>Bước 2:</strong> Chọn loại câu hỏi bên dưới, nhập hoặc chỉnh prompt rồi nhấn <strong>✨ Tạo câu hỏi bằng AI</strong>
+                📝 Chọn loại câu hỏi bên dưới, nhập hoặc chỉnh prompt rồi nhấn <strong>✨ Tạo câu hỏi bằng AI</strong>
               </div>
 
               <div className="mt-4 flex gap-2">
@@ -1350,91 +1264,103 @@ function FirebaseQuestionList({
   deletingId: string;
   onDelete: (questionId: string) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const trueFalseQuestions = questions.filter(isTrueFalseQuestion);
   const multiTrueFalseQuestions = questions.filter(isMultiTrueFalseQuestion);
 
   return (
     <div className="rounded-3xl bg-white/95 p-4 shadow-xl">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div 
+        className="flex cursor-pointer flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="flex items-center gap-2">
           <h3 className="font-black text-violet-700">📚 Ngân hàng câu hỏi Firebase</h3>
-          <p className="text-sm text-slate-500">Danh sách này đang đồng bộ theo thời gian thực cho toàn bộ app.</p>
+          <span className="text-violet-400 transition-transform duration-300 text-xs" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+            ▼
+          </span>
         </div>
-        <div className="rounded-2xl bg-slate-100 px-3 py-2 text-sm font-bold text-slate-700">
-          {loading ? "Đang đồng bộ..." : `${questions.length} câu hỏi`}
+        <div className="flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-100 px-3 py-2 text-sm font-bold text-slate-700">
+            {loading ? "Đang đồng bộ..." : `${questions.length} câu hỏi`}
+          </div>
         </div>
       </div>
 
-      {!loading && questions.length === 0 && (
-        <div className="mt-4 rounded-2xl bg-violet-50 p-4 text-sm text-violet-700">
-          Ngân hàng câu hỏi hiện đang rỗng. Hãy tạo câu hỏi đầu tiên để các game bắt đầu hoạt động trở lại.
-        </div>
-      )}
-
-      {trueFalseQuestions.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Câu đơn ({trueFalseQuestions.length})</p>
-          {trueFalseQuestions.map((question) => (
-            <div key={question.id} className="mt-2 rounded-2xl bg-slate-50 p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 text-sm">
-                  <p>
-                    <span className={question.correct ? "font-bold text-emerald-600" : "font-bold text-rose-600"}>
-                      [{question.correct ? "Đ" : "S"}]
-                    </span>{" "}
-                    <ChemText text={question.statement} />
-                  </p>
-                  <p className="mt-1 text-xs italic text-slate-500">
-                    <ChemText text={question.explanation} />
-                  </p>
-                  <QuestionMetaRow question={question} />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onDelete(question.id)}
-                  disabled={deletingId === question.id}
-                  className="rounded-xl px-3 py-2 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {deletingId === question.id ? "..." : "🗑️"}
-                </button>
-              </div>
+      {isOpen && (
+        <div className="mt-4 animate-fade-in border-t border-slate-100 pt-4">
+          {!loading && questions.length === 0 && (
+            <div className="rounded-2xl bg-violet-50 p-4 text-sm text-violet-700">
+              Ngân hàng câu hỏi hiện đang rỗng. Hãy tạo câu hỏi đầu tiên để các game bắt đầu hoạt động trở lại.
             </div>
-          ))}
-        </div>
-      )}
+          )}
 
-      {multiTrueFalseQuestions.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Câu 4 ý ({multiTrueFalseQuestions.length})</p>
-          {multiTrueFalseQuestions.map((question) => (
-            <div key={question.id} className="mt-2 rounded-2xl bg-slate-50 p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 text-sm">
-                  <p className="font-medium"><ChemText text={question.question} /></p>
-                  {question.statements.map((statement) => (
-                    <p key={statement.id} className="mt-1 ml-3">
-                      <span className={statement.correct ? "font-bold text-emerald-600" : "font-bold text-rose-600"}>
-                        [{statement.correct ? "Đ" : "S"}]
-                      </span>{" "}
-                      {statement.label} <ChemText text={statement.text} />
-                    </p>
-                  ))}
-                  <p className="mt-1 text-xs italic text-slate-500">
-                    <ChemText text={question.explanation} />
-                  </p>
-                  <QuestionMetaRow question={question} />
+          {trueFalseQuestions.length > 0 && (
+            <div className="mb-6">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Câu đơn ({trueFalseQuestions.length})</p>
+              {trueFalseQuestions.map((question) => (
+                <div key={question.id} className="mt-2 rounded-2xl bg-slate-50 p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 text-sm">
+                      <p>
+                        <span className={question.correct ? "font-bold text-emerald-600" : "font-bold text-rose-600"}>
+                          [{question.correct ? "Đ" : "S"}]
+                        </span>{" "}
+                        <ChemText text={question.statement} />
+                      </p>
+                      <p className="mt-1 text-xs italic text-slate-500">
+                        <ChemText text={question.explanation} />
+                      </p>
+                      <QuestionMetaRow question={question} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onDelete(question.id); }}
+                      disabled={deletingId === question.id}
+                      className="rounded-xl px-3 py-2 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deletingId === question.id ? "..." : "🗑️"}
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onDelete(question.id)}
-                  disabled={deletingId === question.id}
-                  className="rounded-xl px-3 py-2 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {deletingId === question.id ? "..." : "🗑️"}
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {multiTrueFalseQuestions.length > 0 && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Câu 4 ý ({multiTrueFalseQuestions.length})</p>
+              {multiTrueFalseQuestions.map((question) => (
+                <div key={question.id} className="mt-2 rounded-2xl bg-slate-50 p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 text-sm">
+                      <p className="font-medium"><ChemText text={question.question} /></p>
+                      {question.statements.map((statement) => (
+                        <p key={statement.id} className="mt-1 ml-3">
+                          <span className={statement.correct ? "font-bold text-emerald-600" : "font-bold text-rose-600"}>
+                            [{statement.correct ? "Đ" : "S"}]
+                          </span>{" "}
+                          {statement.label} <ChemText text={statement.text} />
+                        </p>
+                      ))}
+                      <p className="mt-1 text-xs italic text-slate-500">
+                        <ChemText text={question.explanation} />
+                      </p>
+                      <QuestionMetaRow question={question} />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onDelete(question.id); }}
+                      disabled={deletingId === question.id}
+                      className="rounded-xl px-3 py-2 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deletingId === question.id ? "..." : "🗑️"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
