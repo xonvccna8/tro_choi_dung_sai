@@ -117,6 +117,7 @@ export function LiveBattleRoomPage() {
 
   const minimumPlayers = 2;
   const isHost = room?.hostId === appUser?.id;
+  const isObservingHost = isHost && room?.mode !== "duel";
   const questionDurationMs = room ? room.questionDurationSeconds * 1000 : 0;
   const totalBattleDurationMs = room ? room.questions.length * questionDurationMs : 0;
   const scheduledStartMs = room ? new Date(room.scheduledStartAt).getTime() : 0;
@@ -503,7 +504,7 @@ export function LiveBattleRoomPage() {
             {room.status === "live" && currentQuestion && (
               <>
                 {/* ── GV/Host: Màn hình giám sát đua điểm kiểu Quizizz ── */}
-                {isHost && (
+                {isObservingHost && (
                   <section className="overflow-hidden rounded-[2rem] border border-white/50 bg-white/95 shadow-xl">
                     <div className="relative bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 px-6 py-5 text-white">
                       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.15),transparent_60%)]" />
@@ -578,7 +579,7 @@ export function LiveBattleRoomPage() {
                 )}
 
                 {/* ── Học sinh: Giao diện trả lời câu hỏi ── */}
-                {!isHost && (
+                {!isObservingHost && (
                   <section className="rounded-[2rem] border border-white/50 bg-white/95 p-6 shadow-xl">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div>

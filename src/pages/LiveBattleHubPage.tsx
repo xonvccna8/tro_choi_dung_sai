@@ -63,7 +63,7 @@ export function LiveBattleHubPage() {
   const [title, setTitle] = useState(requestedMode === "duel" ? "Đối kháng 1 & 1" : "Đối kháng 1 & lớp");
   const [scheduledStartAt, setScheduledStartAt] = useState(toDatetimeLocalValue(new Date(Date.now() + 2 * 60_000)));
   const [questionCount, setQuestionCount] = useState(8);
-  const [questionDurationSeconds, setQuestionDurationSeconds] = useState(20);
+  const [questionDurationSeconds, setQuestionDurationSeconds] = useState(30);
   const [maxPlayers, setMaxPlayers] = useState(20);
   const [joinCode, setJoinCode] = useState("");
   const [busyAction, setBusyAction] = useState<"create" | "join" | "">("");

@@ -568,7 +568,7 @@ export async function createMatchedDuelRoom(
   me: AppUser,
   opponent: MatchmakingEntry,
   questions: BattleRoomQuestion[],
-  questionDurationSeconds = 20,
+  questionDurationSeconds = 30,
 ) {
   const database = ensureDb();
   const roomRef = doc(collection(database, "battleRooms"));
