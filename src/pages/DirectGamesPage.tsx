@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GameShell } from "../components/GameShell";
+import { QuestionBankNotice } from "../components/QuestionBankNotice";
+import { useAppAuth } from "../lib/AuthContext";
 import {
   ArrowLeft,
   ArrowRight,
@@ -28,7 +31,29 @@ import {
 
 export function DirectGamesPage() {
   const navigate = useNavigate();
-  const user = useGameStore((state) => state.user);
+  const storedUser = useGameStore((state) => state.user);
+  const { profile, currentUser, isConfigured } = useAppAuth();
+  
+  const user = profile ?? storedUser;
+  const canUseRealtimeBattle = Boolean(isConfigured && user && currentUser);
+
+  if (!canUseRealtimeBattle) {
+    return (
+      <GameShell title="Đấu trực tiếp" subtitle="Đối kháng trực tiếp theo thời gian thực">
+        <QuestionBankNotice
+          title="Đấu trực tiếp cần đăng nhập Firebase"
+          description="Chế độ Đối kháng trực tiếp dùng Firestore để tìm kiếm đối thủ và đồng bộ phòng chờ. Bạn cần Đăng xuất rồi Đăng nhập lại bằng tài khoản CÓ THÀNH CÔNG FIREBASE trước khi bắt đầu."
+          tone="amber"
+          actionText="Về màn hình đăng nhập"
+          onAction={() => {
+            useGameStore.getState().logout();
+            navigate("/");
+          }}
+        />
+      </GameShell>
+    );
+  }
+
   const logoutTone: "admin" | "teacher" | "student" =
     user?.role === "teacher" ? "teacher" : user?.role === "admin" ? "admin" : "student";
 
