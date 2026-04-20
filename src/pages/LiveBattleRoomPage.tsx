@@ -139,6 +139,7 @@ export function LiveBattleRoomPage() {
   const currentRank = currentPlayer ? players.findIndex((player) => player.userId === currentPlayer.userId) + 1 : 0;
 
   useEffect(() => {
+    if (isObservingHost) return;
     if (!room || !appUser || currentPlayer || joiningRef.current) return;
 
     joiningRef.current = true;

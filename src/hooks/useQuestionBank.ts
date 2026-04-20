@@ -12,7 +12,7 @@ export function useQuestionBank(customTeacherId?: string | null) {
 
   const teacherId = customTeacherId !== undefined 
     ? customTeacherId 
-    : (user?.role === "admin" ? null : user?.teacherId);
+    : (user?.role === "admin" ? null : (user?.role === "teacher" ? user.id : user?.teacherId));
 
   useEffect(() => {
     const unsubscribe = subscribeToQuestions(

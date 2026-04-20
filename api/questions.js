@@ -189,7 +189,11 @@ async function listQuestions(req, res) {
   if (teacherId && teacherId.startsWith("demo-")) {
     try {
       const dbData = mockData;
-      sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
+      let qList = dbData.questions || [];
+      if (teacherId) {
+        qList = qList.filter(q => q.createdByUid === teacherId);
+      }
+      sendJson(res, 200, { configured: true, questions: qList });
       return;
     } catch (e) {
       console.error("Lỗi đọc Mock DB trong listQuestions:", e);
@@ -286,8 +290,13 @@ export default async function handler(req, res) {
         if (fs.existsSync(mockDataPath)) {
           const dbRaw = fs.readFileSync(mockDataPath, "utf-8");
           const dbData = JSON.parse(dbRaw);
+          const tId = typeof req.query.teacherId === "string" ? req.query.teacherId.trim() : "";
+          let qList = dbData.questions || [];
+          if (tId) {
+            qList = qList.filter(q => q.createdByUid === tId);
+          }
           // Cho frontend biết cấu hình true để không hiện đỏ
-          sendJson(res, 200, { configured: true, questions: dbData.questions || [] });
+          sendJson(res, 200, { configured: true, questions: qList });
           return;
         }
       } catch (e) {

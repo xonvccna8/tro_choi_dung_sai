@@ -279,7 +279,9 @@ export async function createBattleRoom(input: {
     updatedAt: room.updatedAt,
   } satisfies BattleRoomDocument);
 
-  await setDoc(doc(database, "battleRooms", room.id, "players", input.host.id), buildInitialPlayer(input.host));
+  if (input.mode === "duel") {
+    await setDoc(doc(database, "battleRooms", room.id, "players", input.host.id), buildInitialPlayer(input.host));
+  }
 
   return room;
 }
