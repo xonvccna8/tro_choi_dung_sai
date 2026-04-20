@@ -42,13 +42,9 @@ export function DirectGamesPage() {
       <GameShell title="Đấu trực tiếp" subtitle="Đối kháng trực tiếp theo thời gian thực">
         <QuestionBankNotice
           title="Đấu trực tiếp cần đăng nhập Firebase"
-          description="Chế độ Đối kháng trực tiếp dùng Firestore để tìm kiếm đối thủ và đồng bộ phòng chờ. Bạn cần Đăng xuất rồi Đăng nhập lại bằng tài khoản CÓ THÀNH CÔNG FIREBASE trước khi bắt đầu."
+          description="Chế độ Đối kháng trực tiếp dùng Firestore để tìm kiếm đối thủ và đồng bộ phòng chờ. Bạn cần đăng xuất tài khoản cục bộ này và Đăng nhập lại bằng tài khoản Firebase thật trước khi bắt đầu tranh tài."
           tone="amber"
-          actionText="Về màn hình đăng nhập"
-          onAction={() => {
-            useGameStore.getState().logout();
-            navigate("/");
-          }}
+          hideAction
         />
       </GameShell>
     );
